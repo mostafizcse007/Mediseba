@@ -363,6 +363,10 @@ const API = {
         cancel(id, reason) {
             return API.post(`api/appointments/${id}/cancel`, { reason });
         },
+
+        submitReview(id, reviewData) {
+            return API.post(`api/appointments/${id}/review`, reviewData);
+        },
         
         statistics() {
             return API.get('api/appointments/statistics');

@@ -680,6 +680,36 @@ function formatHeroRating(value) {
     return numericValue.toFixed(1);
 }
 
+function formatDoctorAverageRating(value) {
+    const numericValue = Number(value);
+
+    if (!Number.isFinite(numericValue) || numericValue <= 0) {
+        return '0.0';
+    }
+
+    return numericValue.toFixed(1);
+}
+
+function getDoctorRatingDisplay(doctor = {}) {
+    const totalReviews = Math.max(0, Number(doctor.total_reviews) || 0);
+
+    if (totalReviews < 1) {
+        return {
+            hasReviews: false,
+            value: 'New',
+            meta: 'No patient reviews yet',
+            reviewCountLabel: 'No reviews yet'
+        };
+    }
+
+    return {
+        hasReviews: true,
+        value: formatDoctorAverageRating(doctor.average_rating),
+        meta: `${totalReviews} review${totalReviews === 1 ? '' : 's'}`,
+        reviewCountLabel: `${totalReviews} review${totalReviews === 1 ? '' : 's'}`
+    };
+}
+
 function setHeroStat(id, value) {
     const element = document.getElementById(id);
     if (element) {
@@ -788,7 +818,10 @@ async function loadFeaturedDoctors() {
             return;
         }
         
-        container.innerHTML = doctors.map(doctor => `
+        container.innerHTML = doctors.map(doctor => {
+            const rating = getDoctorRatingDisplay(doctor);
+
+            return `
             <div class="doctor-card">
                 <div class="doctor-image">
                     <img src="${escapeHtml(resolveAssetPath(doctor.profile_photo, 'images/default-doctor.svg'))}" 
@@ -802,9 +835,9 @@ async function loadFeaturedDoctors() {
                     <h3>${escapeHtml(doctor.full_name)}</h3>
                     <p class="doctor-specialty">${escapeHtml(doctor.specialty)}</p>
                     <div class="doctor-meta">
-                        <span class="doctor-rating">
+                        <span class="doctor-rating ${rating.hasReviews ? '' : 'is-new'}" title="${escapeHtml(rating.meta)}">
                             <i class="fas fa-star" aria-hidden="true"></i>
-                            ${escapeHtml(doctor.average_rating)}
+                            ${escapeHtml(rating.value)}
                         </span>
                         <span class="doctor-experience">
                             ${escapeHtml(doctor.experience_years)} years exp
@@ -820,7 +853,8 @@ async function loadFeaturedDoctors() {
                     </div>
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
         
     } catch (error) {
         console.error('Failed to load featured doctors:', error);
@@ -851,7 +885,10 @@ async function loadDoctorList(params = {}) {
             return;
         }
         
-        container.innerHTML = result.items.map(doctor => `
+        container.innerHTML = result.items.map(doctor => {
+            const rating = getDoctorRatingDisplay(doctor);
+
+            return `
             <div class="doctor-list-item">
                 <div class="doctor-list-image">
                     <img src="${escapeHtml(resolveAssetPath(doctor.profile_photo, 'images/default-doctor.svg'))}" 
@@ -865,7 +902,7 @@ async function loadDoctorList(params = {}) {
                     <p class="doctor-list-specialty">${escapeHtml(doctor.specialty)}</p>
                     <p class="doctor-list-qualification">${escapeHtml(doctor.qualification)}</p>
                     <div class="doctor-list-meta">
-                        <span><i class="fas fa-star"></i> ${escapeHtml(doctor.average_rating)}</span>
+                        <span><i class="fas fa-star"></i> ${escapeHtml(rating.value)}${rating.hasReviews ? ` (${escapeHtml(rating.meta)})` : ''}</span>
                         <span><i class="fas fa-briefcase"></i> ${escapeHtml(doctor.experience_years)} years</span>
                         <span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(doctor.clinic_name || 'Dhaka')}</span>
                     </div>
@@ -877,7 +914,8 @@ async function loadDoctorList(params = {}) {
                     </a>
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
         
         // Update pagination
         updatePagination(result, params);

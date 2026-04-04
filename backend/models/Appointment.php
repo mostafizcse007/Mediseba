@@ -208,10 +208,13 @@ class Appointment extends Model
         $sql = "SELECT a.*, 
                 d.full_name as doctor_name, d.specialty, d.clinic_name, d.clinic_address,
                 d.consultation_fee,
-                p.status as payment_status, p.amount as paid_amount
+                p.status as payment_status, p.amount as paid_amount,
+                dr.id as review_id, dr.rating as review_rating, dr.review_text, dr.is_visible as review_is_visible,
+                dr.created_at as review_created_at, dr.updated_at as review_updated_at
                 FROM {$this->table} a
                 JOIN doctor_profiles d ON a.doctor_id = d.id
                 LEFT JOIN payments p ON a.id = p.appointment_id
+                LEFT JOIN doctor_reviews dr ON a.id = dr.appointment_id
                 WHERE {$whereClause}
                 ORDER BY a.appointment_date DESC, a.token_number ASC
                 LIMIT ? OFFSET ?";
@@ -405,6 +408,8 @@ class Appointment extends Model
                 pay.id as payment_id, pay.payment_number, pay.currency as payment_currency,
                 pay.status as payment_status, pay.amount as paid_amount, pay.payment_method,
                 pay.transaction_id, pay.paid_at, pay.created_at as payment_created_at,
+                dr.id as review_id, dr.rating as review_rating, dr.review_text, dr.is_visible as review_is_visible,
+                dr.created_at as review_created_at, dr.updated_at as review_updated_at,
                 rx.id as prescription_id, rx.prescription_number, rx.symptoms, rx.diagnosis, rx.medicine_list, 
                 rx.dosage_instructions, rx.advice, rx.follow_up_date
                 FROM {$this->table} a
@@ -412,6 +417,7 @@ class Appointment extends Model
                 JOIN patient_profiles p ON a.patient_id = p.id
                 JOIN users u ON p.user_id = u.id
                 LEFT JOIN payments pay ON a.id = pay.appointment_id
+                LEFT JOIN doctor_reviews dr ON a.id = dr.appointment_id
                 LEFT JOIN prescriptions rx ON a.id = rx.appointment_id AND rx.is_deleted = 0
                 WHERE a.id = ?";
         

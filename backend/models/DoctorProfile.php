@@ -130,7 +130,13 @@ class DoctorProfile extends Model
             $orderBy = 'created_at';
         }
         
-        $sql = "SELECT * FROM {$this->table} WHERE {$whereClause} ORDER BY is_featured DESC, {$orderBy} {$direction} LIMIT ? OFFSET ?";
+        $orderExpression = $orderBy;
+
+        if ($orderBy === 'average_rating') {
+            $orderExpression = 'CASE WHEN total_reviews > 0 THEN average_rating ELSE 0 END';
+        }
+
+        $sql = "SELECT * FROM {$this->table} WHERE {$whereClause} ORDER BY is_featured DESC, {$orderExpression} {$direction}, total_reviews DESC, created_at DESC LIMIT ? OFFSET ?";
         $params[] = $perPage;
         $params[] = $offset;
         
@@ -169,7 +175,7 @@ class DoctorProfile extends Model
     {
         $sql = "SELECT * FROM {$this->table} 
                 WHERE is_verified = 1 AND is_featured = 1 
-                ORDER BY average_rating DESC, total_appointments DESC 
+                ORDER BY CASE WHEN total_reviews > 0 THEN average_rating ELSE 0 END DESC, total_reviews DESC, total_appointments DESC 
                 LIMIT ?";
         
         $stmt = $this->db->prepare($sql);
@@ -179,7 +185,7 @@ class DoctorProfile extends Model
         if (empty($featured)) {
             $fallbackSql = "SELECT * FROM {$this->table}
                             WHERE is_verified = 1
-                            ORDER BY average_rating DESC, total_appointments DESC, created_at DESC
+                            ORDER BY CASE WHEN total_reviews > 0 THEN average_rating ELSE 0 END DESC, total_reviews DESC, total_appointments DESC, created_at DESC
                             LIMIT ?";
             $fallbackStmt = $this->db->prepare($fallbackSql);
             $fallbackStmt->execute([$limit]);
@@ -368,7 +374,7 @@ class DoctorProfile extends Model
     public function updateRating(int $doctorId): bool
     {
         $sql = "UPDATE {$this->table} 
-                SET average_rating = COALESCE((SELECT AVG(rating) FROM doctor_reviews WHERE doctor_id = ? AND is_visible = 1), 5.0),
+                SET average_rating = COALESCE((SELECT AVG(rating) FROM doctor_reviews WHERE doctor_id = ? AND is_visible = 1), 0.0),
                     total_reviews = (SELECT COUNT(*) FROM doctor_reviews WHERE doctor_id = ? AND is_visible = 1)
                 WHERE id = ?";
         

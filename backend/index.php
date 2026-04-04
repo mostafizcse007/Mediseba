@@ -197,6 +197,7 @@ $routes = [
     'GET api/appointments/upcoming' => [AppointmentController::class, 'upcoming', 'patient'],
     'GET api/appointments/statistics' => [AppointmentController::class, 'statistics', 'auth'],
     'GET api/appointments/{id}' => [AppointmentController::class, 'show', 'auth'],
+    'POST api/appointments/{id}/review' => [AppointmentController::class, 'saveReview', 'patient'],
     'PATCH api/appointments/{id}/status' => [AppointmentController::class, 'updateStatus', 'auth'],
     'POST api/appointments/{id}/cancel' => [AppointmentController::class, 'cancel', 'auth'],
     

@@ -1331,6 +1331,14 @@ section {
     color: var(--accent);
 }
 
+.doctor-rating.is-new {
+    color: var(--text-muted);
+}
+
+.doctor-rating.is-new i {
+    color: var(--gray-400);
+}
+
 .doctor-experience {
     font-size: var(--font-size-sm);
     color: var(--gray-500);

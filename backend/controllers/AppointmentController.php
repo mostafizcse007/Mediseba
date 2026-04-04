@@ -13,6 +13,7 @@ use MediSeba\Utils\Response;
 use MediSeba\Utils\Validator;
 use MediSeba\Models\Appointment;
 use MediSeba\Models\DoctorProfile;
+use MediSeba\Models\DoctorReview;
 use MediSeba\Models\PatientProfile;
 use MediSeba\Models\Payment;
 
@@ -20,12 +21,14 @@ class AppointmentController
 {
     private Appointment $appointmentModel;
     private DoctorProfile $doctorModel;
+    private DoctorReview $reviewModel;
     private PatientProfile $patientModel;
     
     public function __construct()
     {
         $this->appointmentModel = new Appointment();
         $this->doctorModel = new DoctorProfile();
+        $this->reviewModel = new DoctorReview();
         $this->patientModel = new PatientProfile();
     }
     
@@ -190,6 +193,80 @@ class AppointmentController
             $result['total'],
             $result['page'],
             $result['per_page']
+        );
+    }
+
+    /**
+     * Create or update a patient review for a completed appointment
+     * POST /api/appointments/{id}/review
+     */
+    public function saveReview(int $id, array $request, array $user): void
+    {
+        if ($user['role'] !== 'patient') {
+            Response::forbidden('Only patients can rate doctors');
+        }
+
+        $validator = Validator::quick($request, [
+            'rating' => 'required|integer|min:1|max:5',
+            'review_text' => 'max:1000'
+        ]);
+
+        if (!$validator['valid']) {
+            Response::validationError($validator['errors']);
+        }
+
+        $patient = $this->patientModel->findByUserId($user['user_id']);
+
+        if (!$patient) {
+            Response::notFound('Patient profile');
+        }
+
+        $appointment = $this->appointmentModel->find($id);
+
+        if (!$appointment) {
+            Response::notFound('Appointment');
+        }
+
+        if ((int) $appointment['patient_id'] !== (int) $patient['id']) {
+            Response::forbidden('You can only review your own completed appointments');
+        }
+
+        if (($appointment['status'] ?? '') !== 'completed') {
+            Response::error('You can rate a doctor only after a completed appointment');
+        }
+
+        $rating = (int) $request['rating'];
+        $reviewText = isset($request['review_text']) ? trim((string) $request['review_text']) : null;
+
+        $result = $this->reviewModel->upsertForAppointment(
+            (int) $appointment['doctor_id'],
+            (int) $patient['id'],
+            $id,
+            $rating,
+            $reviewText
+        );
+
+        if (!$result['success']) {
+            Response::error('Failed to save your review. Please try again.');
+        }
+
+        $this->doctorModel->updateRating((int) $appointment['doctor_id']);
+
+        $review = $this->reviewModel->find((int) $result['id']);
+        $doctor = $this->doctorModel->find((int) $appointment['doctor_id']);
+
+        Response::success(
+            $result['action'] === 'updated'
+                ? 'Review updated successfully'
+                : 'Review submitted successfully',
+            [
+                'review' => $review,
+                'doctor' => [
+                    'id' => (int) ($doctor['id'] ?? 0),
+                    'average_rating' => isset($doctor['average_rating']) ? round((float) $doctor['average_rating'], 1) : 0.0,
+                    'total_reviews' => (int) ($doctor['total_reviews'] ?? 0)
+                ]
+            ]
         );
     }
     

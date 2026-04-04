@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Appointment Details - MediSeba</title>
+    <meta name="description" content="View appointment details and payment status in MediSeba.">
+    <script>
+        (function ensureFreshDetailPage() {
+            const currentVersion = '20260403-2';
+            const url = new URL(window.location.href);
+
+            if (url.searchParams.get('v') === currentVersion) {
+                return;
+            }
+
+            url.searchParams.set('v', currentVersion);
+            window.location.replace(url.toString());
+        }());
+    </script>
+    <link rel="stylesheet" href="css/style.css?v=20260404-8">
+    <link rel="stylesheet" href="css/responsive.css?v=20260404-1">
+    <link rel="stylesheet" href="css/auth.css?v=20260404-7">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .detail-shell {
+            min-height: 100vh;
+            background: var(--gray-50);
+        }
+
+        .detail-shell-content {
+            width: 100%;
+            max-width: 1280px;
+            box-sizing: border-box;
+            margin: 0 auto;
+            padding: var(--space-6);
+        }
+
+        .detail-shell-card {
+            padding: var(--space-6);
+        }
+
+        @media (max-width: 768px) {
+            .detail-shell-content {
+                padding: var(--space-4);
+            }
+
+            .detail-shell-card {
+                padding: var(--space-4);
+            }
+        }
+    </style>
+</head>
+<body class="detail-shell" style="margin: 0;">
+    <div class="detail-shell-content" style="width: 100%; max-width: 1280px; margin: 0 auto; box-sizing: border-box; padding: var(--space-6);">
+        <main>
+            <div class="page-header" style="margin-bottom: var(--space-6);">
+                <div>
+                    <h1>Appointment Details</h1>
+                    <p style="color: var(--gray-500); margin-top: var(--space-1);">Review your booking information and current status.</p>
+                </div>
+                <a href="dashboard.html" class="btn btn-outline" id="backLink">Back</a>
+            </div>
+
+            <div class="card detail-shell-card" id="appointmentDetails">
+                <div class="empty-state">
+                    <div class="spinner"></div>
+                    <p>Loading appointment...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/api.js?v=20260404-2"></script>
+    <script src="js/auth.js?v=20260402-4"></script>
+    <script src="js/app.js?v=20260403-14"></script>
+    <script>
+        if (!Auth.requireAuth()) {
+            throw new Error('Authentication required');
+        }
+
+        function getBackLink() {
+            return Auth.hasRole('doctor') ? 'doctor-appointments.html' : 'appointments.html';
+        }
+
+        async function downloadReceipt(paymentId) {
+            try {
+                showLoading();
+                await API.payments.downloadReceipt(paymentId);
+                showToast('Receipt PDF downloaded.', 'success');
+            } catch (error) {
+                showToast(error.message || 'Failed to download receipt PDF.', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function loadAppointment() {
+            const appointmentId = new URLSearchParams(window.location.search).get('id');
+            const container = document.getElementById('appointmentDetails');
+            const isDoctor = Auth.hasRole('doctor');
+
+            document.getElementById('backLink').href = getBackLink();
+            document.getElementById('backLink').textContent = isDoctor ? 'Back to Queue' : 'Back to Appointments';
+
+            if (!appointmentId) {
+                container.innerHTML = '<p>Missing appointment ID.</p>';
+                return;
+            }
+
+            try {
+                const appointment = await API.appointments.get(appointmentId);
+                const paymentStatus = appointment.payment_status || 'pending';
+                const prescriptionNumber = appointment.prescription_number || 'Not issued yet';
+                const actionButtons = [];
+                const chatAvailable = !['cancelled', 'no_show'].includes(String(appointment.status || ''));
+
+                if (chatAvailable) {
+                    actionButtons.push(`<a href="chat.html?appointment=${encodeURIComponent(appointment.id)}" class="btn btn-primary">Open Chat</a>`);
+                }
+
+                if (appointment.prescription_id) {
+                    actionButtons.push(`<a href="prescription.html?id=${encodeURIComponent(appointment.prescription_id)}&v=20260403-1" class="btn btn-primary">View Prescription</a>`);
+                } else if (isDoctor && appointment.status === 'completed') {
+                    actionButtons.push(`<a href="doctor-prescriptions.html?appointment=${encodeURIComponent(appointment.id)}" class="btn btn-primary">Write Prescription</a>`);
+                }
+
+                if (!isDoctor && paymentStatus !== 'success') {
+                    actionButtons.push('<a href="payments.html?v=20260403-4" class="btn btn-outline">Open Payments</a>');
+                }
+
+                if (appointment.payment_id && ['success', 'refunded', 'partially_refunded'].includes(paymentStatus)) {
+                    actionButtons.push(`<button type="button" class="btn btn-outline" onclick="downloadReceipt(${Number(appointment.payment_id)})">Download Receipt</button>`);
+                }
+
+                container.innerHTML = `
+                    <div style="display: grid; gap: var(--space-6);">
+                        <div style="display: flex; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap;">
+                            <div>
+                                <p style="color: var(--gray-500); font-size: var(--font-size-sm);">Appointment Number</p>
+                                <h2>${escapeHtml(appointment.appointment_number || '')}</h2>
+                                <p style="margin-top: var(--space-2); color: var(--gray-600);">${escapeHtml(appointment.doctor_name || '')} • ${escapeHtml(appointment.specialty || '')}</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <span class="status-badge ${escapeHtml(appointment.status || 'pending')}">${escapeHtml(appointment.status || 'pending')}</span>
+                                <p style="margin-top: var(--space-3); color: var(--gray-600);">Token #${escapeHtml(String(appointment.token_number || '-'))}</p>
+                            </div>
+                        </div>
+
+                        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+                            <div class="stat-card">
+                                <p class="stat-card-title">Date</p>
+                                <p class="stat-card-value" style="font-size: var(--font-size-lg);">${formatDate(appointment.appointment_date)}</p>
+                            </div>
+                            <div class="stat-card">
+                                <p class="stat-card-title">Estimated Time</p>
+                                <p class="stat-card-value" style="font-size: var(--font-size-lg);">${formatTime(appointment.estimated_time || '00:00:00')}</p>
+                            </div>
+                            <div class="stat-card">
+                                <p class="stat-card-title">Payment</p>
+                                <p class="stat-card-value" style="font-size: var(--font-size-lg);">${escapeHtml(paymentStatus)}</p>
+                            </div>
+                            <div class="stat-card">
+                                <p class="stat-card-title">Prescription</p>
+                                <p class="stat-card-value" style="font-size: var(--font-size-lg);">${escapeHtml(prescriptionNumber)}</p>
+                            </div>
+                        </div>
+
+                        <div class="card" style="padding: var(--space-5); background: var(--gray-50);">
+                            <h3>Clinic Information</h3>
+                            <p style="margin-top: var(--space-2);">${escapeHtml(appointment.clinic_name || 'Clinic details unavailable')}</p>
+                            <p style="color: var(--gray-600); margin-top: var(--space-1);">${escapeHtml(appointment.clinic_address || '')}</p>
+                            <p style="color: var(--gray-600); margin-top: var(--space-2);">Consultation Fee: ৳${escapeHtml(String(appointment.consultation_fee || '0'))}</p>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4);">
+                            <div class="card" style="padding: var(--space-5);">
+                                <h3>Symptoms</h3>
+                                <p style="margin-top: var(--space-2); color: var(--gray-600);">${escapeHtml(appointment.symptoms || 'No symptoms provided')}</p>
+                            </div>
+                            <div class="card" style="padding: var(--space-5);">
+                                <h3>Notes</h3>
+                                <p style="margin-top: var(--space-2); color: var(--gray-600);">${escapeHtml(appointment.notes || 'No notes added')}</p>
+                            </div>
+                        </div>
+
+                        ${actionButtons.length ? `
+                            <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
+                                ${actionButtons.join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <h3>Unable to load appointment</h3>
+                        <p>${escapeHtml(error.message || 'Please try again later.')}</p>
+                    </div>
+                `;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAppointment);
+    </script>
+</body>
+</html>
+
+
+
+

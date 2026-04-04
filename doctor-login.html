@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Login - MediSeba</title>
+    <meta name="description" content="Doctor Login to manage appointments and patients.">
+    <link rel="stylesheet" href="css/style.css?v=20260404-8">
+    <link rel="stylesheet" href="css/responsive.css?v=20260404-1">
+    <link rel="stylesheet" href="css/auth.css?v=20260404-7">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <!-- Auth Image Side -->
+        <div class="auth-image">
+            <div class="auth-image-content">
+                <h2>Doctor Portal</h2>
+                <p>For doctors who want to manage appointments, publish schedules, and issue prescriptions digitally.</p>
+                <div class="auth-features">
+                    <div class="auth-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Manage your schedule</span>
+                    </div>
+                    <div class="auth-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Write digital prescriptions</span>
+                    </div>
+                    <div class="auth-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Track earnings and appointments</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Auth Form Side -->
+        <div class="auth-form-container">
+            <div class="auth-form-wrapper">
+                <a href="index.html" class="auth-logo" aria-label="MediSeba home">
+                    <img src="images/logo-mark.svg" alt="" class="logo-mark">
+                    <span class="logo-wordmark" aria-hidden="true"><span class="logo-wordmark-primary">Medi</span><span class="logo-wordmark-secondary">Seba</span></span>
+                </a>
+
+                <div class="auth-role-banner doctor">
+                    <i class="fas fa-user-md"></i>
+                    <span>Doctor Login</span>
+                </div>
+
+                <div class="auth-role-note">
+                    <strong>This page is for doctors.</strong>
+                    <p>Use this page only if you are a doctor. Doctors can manage schedules, appointments, and prescriptions here. New doctor accounts also start from this OTP flow.</p>
+                </div>
+                
+                <!-- Step 1: Email Input -->
+                <div class="auth-step" id="step1">
+                    <h1>Doctor Login / Registration</h1>
+                    <p class="auth-subtitle">Enter your doctor email to receive a doctor OTP. First-time doctors will complete their professional profile after verification.</p>
+                    
+                    <form id="emailForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="email" class="form-label form-label-required">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </span>
+                                <input 
+                                    type="email" 
+                                    id="email" 
+                                    name="email" 
+                                    class="form-input" 
+                                    placeholder="doctor@example.com"
+                                    required
+                                    autocomplete="email"
+                                >
+                            </div>
+                            <span class="form-hint">Use the email for your doctor account</span>
+                            <span class="form-error hidden" id="emailError"></span>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg" id="sendOtpBtn">
+                            <span>Send Doctor OTP</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </form>
+                    
+                    <div class="auth-divider">
+                        <span>or</span>
+                    </div>
+                    
+                    <div class="auth-alt auth-alt-card">
+                        <p class="auth-alt-title">Are you a patient?</p>
+                        <p>Patients should use the patient portal for booking appointments, viewing prescriptions, and payments.</p>
+                        <a href="login.html" class="btn btn-outline">
+                            <i class="fas fa-user-injured"></i>
+                            Go to Patient Login
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Step 2: OTP Verification -->
+                <div class="auth-step hidden" id="step2">
+                    <button class="btn-back" id="backToEmail">
+                        <i class="fas fa-arrow-left"></i>
+                        Back
+                    </button>
+                    
+                    <h1>Verify Doctor OTP</h1>
+                    <p class="auth-subtitle">
+                        Enter the 6-digit doctor login code sent to <strong id="maskedEmail"></strong>
+                    </p>
+                    
+                    <form id="otpForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="otp" class="form-label form-label-required">OTP Code</label>
+                            <div class="otp-inputs">
+                                <input type="text" maxlength="1" class="otp-digit" data-index="0">
+                                <input type="text" maxlength="1" class="otp-digit" data-index="1">
+                                <input type="text" maxlength="1" class="otp-digit" data-index="2">
+                                <input type="text" maxlength="1" class="otp-digit" data-index="3">
+                                <input type="text" maxlength="1" class="otp-digit" data-index="4">
+                                <input type="text" maxlength="1" class="otp-digit" data-index="5">
+                            </div>
+                            <input type="hidden" id="otp" name="otp">
+                            <span class="form-error hidden" id="otpError"></span>
+                        </div>
+                        
+                        <div class="otp-timer">
+                            <span>Code expires in </span>
+                            <span id="timer" class="timer">05:00</span>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg" id="verifyOtpBtn">
+                            <span>Verify Doctor Access</span>
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </form>
+                    
+                    <div class="auth-resend">
+                        <p>Didn't receive the code?</p>
+                        <button class="btn-link" id="resendOtp" disabled>
+                            Resend OTP <span id="resendTimer">(60s)</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Complete Profile (for new doctors) -->
+                <div class="auth-step hidden" id="step3">
+                    <h1>Complete Doctor Profile</h1>
+                    <p class="auth-subtitle">Please provide your professional details to finish doctor registration.</p>
+                    
+                    <form id="profileForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="fullName" class="form-label form-label-required">Full Name (with title)</label>
+                            <input type="text" id="fullName" name="full_name" class="form-input" placeholder="Dr. John Doe" required>
+                            <span class="form-error hidden" id="fullNameError"></span>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="specialty" class="form-label form-label-required">Specialty</label>
+                                <input type="text" id="specialty" name="specialty" class="form-input" placeholder="e.g. Cardiologist" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="experience_years" class="form-label form-label-required">Experience (Years)</label>
+                                <input type="number" id="experience_years" name="experience_years" class="form-input" min="0" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="consultation_fee" class="form-label form-label-required">Consultation Fee</label>
+                                <input type="number" id="consultation_fee" name="consultation_fee" class="form-input" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="qualification" class="form-label form-label-required">Qualifications</label>
+                                <input type="text" id="qualification" name="qualification" class="form-input" placeholder="MBBS, MD" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="registration_number" class="form-label">Registration Number</label>
+                            <input type="text" id="registration_number" name="registration_number" class="form-input" maxlength="100" placeholder="BMDC or professional registration number">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="clinic_name" class="form-label">Clinic Name</label>
+                            <input type="text" id="clinic_name" name="clinic_name" class="form-input" placeholder="Optional">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="clinic_address" class="form-label">Clinic Address</label>
+                            <textarea id="clinic_address" name="clinic_address" class="form-textarea" rows="2"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg" id="completeProfileBtn">
+                            <span>Submit Profile for Verification</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="auth-footer">
+                    <p>By continuing, you agree to our <a href="terms.html">Terms of Service</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+    
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <script src="js/api.js?v=20260404-2"></script>
+    <script src="js/email-otp.js?v=20260404-1"></script>
+    <script src="js/auth.js?v=20260403-10"></script>
+    <script src="js/app.js?v=20260403-14"></script>
+    <script>
+        let currentEmail = '';
+        let otpExpiryTimer = null;
+        let resendTimer = null;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            if (Auth.isLoggedIn()) {
+                const user = Auth.getUser();
+                window.location.href = user.role === 'doctor' ? 'doctor-dashboard.html' : 'dashboard.html';
+                return;
+            }
+            
+            initEmailForm();
+            initOtpForm();
+            initProfileForm();
+            initOtpInputs();
+        });
+        
+        function initEmailForm() {
+            const form = document.getElementById('emailForm');
+            const emailInput = document.getElementById('email');
+            
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const email = emailInput.value.trim();
+                
+                if (!validateEmail(email)) {
+                    showError('emailError', 'Please enter a valid email address');
+                    return;
+                }
+                
+                hideError('emailError');
+                showLoading();
+                
+                try {
+                    const requestResult = await API.auth.requestOTP(email, 'doctor');
+                    await deliverOtpIfNeeded(email, requestResult, 'doctor login');
+                    
+                    currentEmail = email;
+                    document.getElementById('maskedEmail').textContent = maskEmail(email);
+                    
+                    showStep(2);
+                    startOtpTimer(300);
+                    startResendTimer(60);
+                    
+                    showToast('Doctor OTP sent successfully!', 'success');
+                    document.querySelector('.otp-digit[data-index="0"]').focus();
+                    
+                } catch (error) {
+                    showError('emailError', error.message || 'Failed to send OTP');
+                } finally {
+                    hideLoading();
+                }
+            });
+        }
+        
+        function initOtpForm() {
+            const form = document.getElementById('otpForm');
+            
+            document.getElementById('backToEmail').addEventListener('click', () => {
+                showStep(1);
+                clearTimers();
+            });
+            
+            document.getElementById('resendOtp').addEventListener('click', async () => {
+                if (document.getElementById('resendOtp').disabled) return;
+                showLoading();
+                
+                try {
+                    const requestResult = await API.auth.requestOTP(currentEmail, 'doctor');
+                    await deliverOtpIfNeeded(currentEmail, requestResult, 'doctor login');
+                    
+                    startOtpTimer(300);
+                    startResendTimer(60);
+                    
+                    document.querySelectorAll('.otp-digit').forEach(input => input.value = '');
+                    document.getElementById('otp').value = '';
+                    
+                    showToast('OTP resent!', 'success');
+                    
+                } catch (error) {
+                    showToast(error.message || 'Failed to resend OTP', 'error');
+                } finally {
+                    hideLoading();
+                }
+            });
+            
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const otp = document.getElementById('otp').value;
+                
+                if (otp.length !== 6) {
+                    showError('otpError', 'Please enter the complete 6-digit OTP');
+                    return;
+                }
+                
+                hideError('otpError');
+                showLoading();
+                
+                try {
+                    // Send ROLE dynamically as 'doctor'
+                    const result = await API.auth.verifyOTP(currentEmail, otp, 'doctor');
+                    
+                    Auth.setToken(result.token);
+                    Auth.setUser(result.user);
+                    
+                    if (result.is_new_user || result.user.role === 'doctor' && result.is_new_user === true) {
+                        showStep(3);
+                    } else {
+                        showToast('Doctor Login successful!', 'success');
+                        setTimeout(() => {
+                            window.location.href = 'doctor-dashboard.html';
+                        }, 1000);
+                    }
+                    
+                } catch (error) {
+                    showError('otpError', error.message || 'Invalid OTP');
+                } finally {
+                    hideLoading();
+                }
+            });
+        }
+        
+        function initProfileForm() {
+            const form = document.getElementById('profileForm');
+            
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData);
+                
+                if (!data.full_name || data.full_name.trim().length < 3) {
+                    showError('fullNameError', 'Name must be at least 3 characters');
+                    return;
+                }
+                hideError('fullNameError');
+                
+                showLoading();
+                
+                try {
+                    // This naturally maps to completeDoctorProfile inside backend because user['role'] == 'doctor' now
+                    await API.auth.completeProfile(data);
+                    const currentUser = Auth.getUser() || {};
+                    Auth.setUser({ ...currentUser, full_name: data.full_name });
+                    
+                    showToast('Profile completed! Pending admin verification.', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'doctor-dashboard.html';
+                    }, 1500);
+                    
+                } catch (error) {
+                    showToast(error.message || 'Failed to complete profile', 'error');
+                } finally {
+                    hideLoading();
+                }
+            });
+        }
+        
+        function initOtpInputs() {
+            const inputs = document.querySelectorAll('.otp-digit');
+            const otpHidden = document.getElementById('otp');
+            
+            inputs.forEach((input, index) => {
+                input.addEventListener('input', (e) => {
+                    e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                    const otp = Array.from(inputs).map(i => i.value).join('');
+                    otpHidden.value = otp;
+                    if (e.target.value && index < inputs.length - 1) inputs[index + 1].focus();
+                });
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !e.target.value && index > 0) inputs[index - 1].focus();
+                });
+                input.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const pastedData = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+                    pastedData.split('').forEach((digit, i) => { if (inputs[i]) inputs[i].value = digit; });
+                    otpHidden.value = pastedData;
+                    if (inputs[pastedData.length]) inputs[pastedData.length].focus();
+                });
+            });
+        }
+        
+        function showStep(step) {
+            document.querySelectorAll('.auth-step').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`step${step}`).classList.remove('hidden');
+        }
+        
+        function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+        function maskEmail(email) {
+            const [local, domain] = email.split('@');
+            if (local.length <= 2) return email;
+            return local.slice(0, 2) + '*'.repeat(local.length - 2) + '@' + domain;
+        }
+        
+        function startOtpTimer(seconds) {
+            clearInterval(otpExpiryTimer);
+            const timerEl = document.getElementById('timer');
+            let remaining = seconds;
+            otpExpiryTimer = setInterval(() => {
+                remaining--;
+                const mins = Math.floor(remaining / 60);
+                const secs = remaining % 60;
+                timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                if (remaining <= 0) {
+                    clearInterval(otpExpiryTimer);
+                    showError('otpError', 'OTP expired.');
+                }
+            }, 1000);
+        }
+        
+        function startResendTimer(seconds) {
+            clearInterval(resendTimer);
+            const resendBtn = document.getElementById('resendOtp');
+            const timerEl = document.getElementById('resendTimer');
+            let remaining = seconds;
+            resendBtn.disabled = true;
+            timerEl.textContent = `(${remaining}s)`;
+            resendTimer = setInterval(() => {
+                remaining--;
+                timerEl.textContent = `(${remaining}s)`;
+                if (remaining <= 0) {
+                    clearInterval(resendTimer);
+                    resendBtn.disabled = false;
+                    timerEl.textContent = '';
+                }
+            }, 1000);
+        }
+        function clearTimers() { clearInterval(otpExpiryTimer); clearInterval(resendTimer); }
+
+        async function deliverOtpIfNeeded(email, requestResult, context) {
+            if (!requestResult?.otp) {
+                return;
+            }
+
+            await EmailOtp.sendOtp(email, requestResult?.otp, context);
+        }
+        
+        function showLoading() { document.getElementById('loadingOverlay').classList.add('active'); }
+        function hideLoading() { document.getElementById('loadingOverlay').classList.remove('active'); }
+        function showError(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.classList.remove('hidden'); }
+        function hideError(id) { document.getElementById(id).classList.add('hidden'); }
+    </script>
+</body>
+</html>
+
+
+
+

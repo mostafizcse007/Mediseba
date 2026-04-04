@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Consultation Chat - MediSeba</title>
+    <meta name="description" content="Chat with your doctor or patient for an active MediSeba appointment.">
+    <link rel="stylesheet" href="css/style.css?v=20260404-8">
+    <link rel="stylesheet" href="css/responsive.css?v=20260404-1">
+    <link rel="stylesheet" href="css/auth.css?v=20260404-7">
+    <link rel="stylesheet" href="css/chat.css?v=20260404-4">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="chat-page">
+    <div class="chat-shell">
+        <main class="chat-layout">
+            <section class="card chat-topbar">
+                <div class="chat-topbar-copy">
+                    <p class="chat-topbar-eyebrow">MediSeba Consultation</p>
+                    <h1 id="chatPageTitle">Consultation Chat</h1>
+                    <p class="chat-topbar-subtitle">Secure appointment chat for consultation updates between doctor and patient.</p>
+                </div>
+                <div class="chat-topbar-actions">
+                    <a href="appointments.html" class="btn btn-outline btn-sm" id="chatBackLink">Back</a>
+                    <a href="appointments.html" class="btn btn-primary btn-sm" id="appointmentDetailLink">Appointment Details</a>
+                </div>
+            </section>
+
+            <section class="card chat-panel">
+                <header class="chat-panel-header">
+                    <div class="chat-panel-heading">
+                        <div class="chat-panel-heading-copy">
+                            <p class="chat-panel-eyebrow">Appointment Room</p>
+                            <h2>Conversation</h2>
+                            <p class="chat-note">Use this room for consultation-related questions and updates.</p>
+                        </div>
+                        <div class="chat-panel-heading-actions">
+                            <div class="chat-polling-indicator" id="chatPollingIndicator" aria-live="polite">
+                                <span class="chat-polling-dot" aria-hidden="true"></span>
+                                <span>Auto refresh every 4s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <section class="chat-summary-grid" id="chatSummary">
+                        <div class="chat-context-card is-loading">
+                            <div class="spinner"></div>
+                            <p>Loading appointment context...</p>
+                        </div>
+                    </section>
+
+                    <section id="chatStatusBanner" class="chat-status-banner" style="display: none;" aria-live="polite"></section>
+                </header>
+
+                <div class="chat-feed-wrap">
+                    <div class="chat-feed" id="chatFeed" aria-live="polite" role="log">
+                        <div class="chat-empty">
+                            <div class="chat-empty-card">
+                                <div class="spinner"></div>
+                                <h3>Loading chat</h3>
+                                <p>Loading conversation...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="chatComposerForm" class="chat-composer">
+                    <label for="chatMessageInput" class="sr-only">New Message</label>
+                    <div class="chat-composer-main">
+                        <div class="chat-input-shell">
+                            <textarea id="chatMessageInput" class="form-input chat-message-input" rows="1" placeholder="Type a consultation message..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary chat-send-btn" id="sendChatMessageButton" aria-label="Send message">
+                            <i class="fas fa-paper-plane"></i>
+                            <span class="chat-send-label">Send</span>
+                        </button>
+                    </div>
+                    <p class="chat-note chat-composer-note" id="chatComposerNote">Auto refresh every 4 seconds.</p>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/api.js?v=20260404-2"></script>
+    <script src="js/auth.js?v=20260402-4"></script>
+    <script src="js/app.js?v=20260403-14"></script>
+    <script src="js/chat.js?v=20260404-2"></script>
+</body>
+</html>
+
+
+
+

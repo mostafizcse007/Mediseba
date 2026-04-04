@@ -6,33 +6,58 @@
     <title>Patient Login - MediSeba</title>
     <meta name="description" content="Patient login for booking appointments, payments, and prescriptions in MediSeba.">
     <link rel="stylesheet" href="css/style.css?v=20260404-8">
-    <link rel="stylesheet" href="css/responsive.css?v=20260404-1">
-    <link rel="stylesheet" href="css/auth.css?v=20260404-7">
+    <link rel="stylesheet" href="css/responsive.css?v=20260404-2">
+    <link rel="stylesheet" href="css/auth.css?v=20260404-10">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
-<body class="auth-page">
+<body class="auth-page auth-page-patient">
     <div class="auth-container">
         <!-- Auth Image Side -->
         <div class="auth-image">
-            <div class="auth-image-content">
-                <h2>Patient Portal</h2>
-                <p>For patients who want to book appointments, pay consultation fees, and view prescriptions in one place.</p>
-                <div class="auth-features">
-                    <div class="auth-feature">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Book appointments 24/7</span>
+            <div class="auth-image-shell">
+                <div class="auth-image-content">
+                    <span class="auth-side-kicker">Secure patient access</span>
+                    <h2>Patient Portal</h2>
+                    <p>Book appointments, receive prescriptions, and keep every follow-up in one calm place.</p>
+                    <p class="auth-side-tagline">A clean OTP flow designed to make booking and follow-up care feel effortless.</p>
+
+                    <div class="auth-trust-signals" aria-label="Patient portal trust signals">
+                        <span><i class="fas fa-shield-halved"></i> Secure</span>
+                        <span><i class="fas fa-circle-check"></i> Verified</span>
+                        <span><i class="fas fa-bolt"></i> Fast</span>
                     </div>
-                    <div class="auth-feature">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Get digital prescriptions</span>
+
+                    <div class="auth-features auth-feature-grid">
+                        <div class="auth-feature">
+                            <span class="auth-feature-icon"><i class="fas fa-calendar-check"></i></span>
+                            <div class="auth-feature-copy">
+                                <strong>Book appointments 24/7</strong>
+                                <span>Find doctors and reserve a slot whenever you need care.</span>
+                            </div>
+                        </div>
+                        <div class="auth-feature">
+                            <span class="auth-feature-icon"><i class="fas fa-notes-medical"></i></span>
+                            <div class="auth-feature-copy">
+                                <strong>Get digital prescriptions</strong>
+                                <span>Keep prescriptions and consultation updates organized.</span>
+                            </div>
+                        </div>
+                        <div class="auth-feature">
+                            <span class="auth-feature-icon"><i class="fas fa-heart-pulse"></i></span>
+                            <div class="auth-feature-copy">
+                                <strong>Track your care journey</strong>
+                                <span>See appointments, payments, and follow-ups in one timeline.</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="auth-feature">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Track your medical history</span>
-                    </div>
+                </div>
+
+                <div class="auth-side-glance">
+                    <span class="auth-side-glance-label">Patient flow</span>
+                    <strong>Appointments, prescriptions, and payment records stay connected from one OTP sign in.</strong>
                 </div>
             </div>
         </div>
@@ -52,13 +77,13 @@
 
                 <div class="auth-role-note">
                     <strong>This page is for patients.</strong>
-                    <p>Use this page if you want to book an appointment, see payments, or view your prescriptions. New patient accounts are created from this same OTP flow.</p>
+                    <p>Continue here for appointments, prescriptions, and payment history. New patient accounts start from this same OTP flow.</p>
                 </div>
                 
                 <!-- Step 1: Email Input -->
                 <div class="auth-step" id="step1">
-                    <h1>Patient Login / Sign Up</h1>
-                    <p class="auth-subtitle">Enter your email to receive a patient OTP. If this is your first time, we will guide you through patient profile setup after verification.</p>
+                    <h1>Continue as a patient</h1>
+                    <p class="auth-subtitle">Enter your email to receive a one-time code. If it is your first visit, we will guide you through patient profile setup after verification.</p>
                     
                     <form id="emailForm" class="auth-form">
                         <div class="form-group">
@@ -81,8 +106,8 @@
                             <span class="form-error hidden" id="emailError"></span>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary btn-lg" id="sendOtpBtn">
-                            <span>Send Patient OTP</span>
+                        <button type="submit" class="btn btn-primary btn-lg" id="sendOtpBtn" data-loading-text="Sending OTP...">
+                            <span>Send OTP to continue</span>
                             <i class="fas fa-arrow-right"></i>
                         </button>
                     </form>
@@ -91,9 +116,9 @@
                         <span>or</span>
                     </div>
                     
-                    <div class="auth-alt auth-alt-card">
+                    <div class="auth-alt auth-alt-card auth-switch-card">
                         <p class="auth-alt-title">Are you a doctor?</p>
-                        <p>Doctors should use the separate doctor portal to manage schedules, appointments, and prescriptions.</p>
+                        <p>Use the dedicated doctor workspace for schedules, appointments, and prescriptions.</p>
                         <a href="doctor-login.html" class="btn btn-outline">
                             <i class="fas fa-user-md"></i>
                             Go to Doctor Login
@@ -133,7 +158,7 @@
                             <span id="timer" class="timer">05:00</span>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary btn-lg" id="verifyOtpBtn">
+                        <button type="submit" class="btn btn-primary btn-lg" id="verifyOtpBtn" data-loading-text="Verifying...">
                             <span>Verify Patient Access</span>
                             <i class="fas fa-check"></i>
                         </button>
@@ -222,7 +247,7 @@
                             ></textarea>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary btn-lg" id="completeProfileBtn">
+                        <button type="submit" class="btn btn-primary btn-lg" id="completeProfileBtn" data-loading-text="Saving profile...">
                             <span>Complete Profile</span>
                             <i class="fas fa-arrow-right"></i>
                         </button>
@@ -480,6 +505,60 @@
             document.querySelectorAll('.auth-step').forEach(el => el.classList.add('hidden'));
             document.getElementById(`step${step}`).classList.remove('hidden');
         }
+
+        let activeLoadingButton = null;
+
+        function getVisiblePrimaryAction() {
+            if (!document.getElementById('step1').classList.contains('hidden')) {
+                return document.getElementById('sendOtpBtn');
+            }
+            if (!document.getElementById('step2').classList.contains('hidden')) {
+                return document.getElementById('verifyOtpBtn');
+            }
+            if (!document.getElementById('step3').classList.contains('hidden')) {
+                return document.getElementById('completeProfileBtn');
+            }
+
+            return null;
+        }
+
+        function setButtonLoading(button, isLoading) {
+            if (!button) {
+                return;
+            }
+
+            const label = button.querySelector('span');
+            const icon = button.querySelector('i');
+
+            if (isLoading) {
+                activeLoadingButton = button;
+                button.dataset.originalLabel = label ? label.textContent : '';
+                button.dataset.originalIcon = icon ? icon.className : '';
+                button.disabled = true;
+                button.classList.add('is-loading');
+
+                if (label && button.dataset.loadingText) {
+                    label.textContent = button.dataset.loadingText;
+                }
+
+                if (icon) {
+                    icon.className = 'fas fa-spinner fa-spin';
+                }
+
+                return;
+            }
+
+            button.disabled = false;
+            button.classList.remove('is-loading');
+
+            if (label && button.dataset.originalLabel) {
+                label.textContent = button.dataset.originalLabel;
+            }
+
+            if (icon && button.dataset.originalIcon) {
+                icon.className = button.dataset.originalIcon;
+            }
+        }
         
         function validateEmail(email) {
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -548,6 +627,20 @@
             const mins = Math.floor(seconds / 60);
             const secs = seconds % 60;
             return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function showLoading(button = getVisiblePrimaryAction()) {
+            setButtonLoading(button, true);
+            document.getElementById('loadingOverlay')?.classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay')?.classList.remove('active');
+
+            if (activeLoadingButton) {
+                setButtonLoading(activeLoadingButton, false);
+                activeLoadingButton = null;
+            }
         }
     </script>
 </body>

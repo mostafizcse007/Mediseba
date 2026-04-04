@@ -241,13 +241,29 @@ class Security
     {
         if (session_status() === PHP_SESSION_NONE) {
             ini_set('session.cookie_httponly', '1');
-            ini_set('session.cookie_secure', '1'); // Force secure cookies as requested
+            ini_set('session.cookie_secure', self::isHttpsRequest() ? '1' : '0');
             ini_set('session.cookie_samesite', 'Strict');
             ini_set('session.use_strict_mode', '1');
             ini_set('session.gc_maxlifetime', (string) (int) Environment::get('SESSION_LIFETIME', 86400));
             
             session_start();
         }
+    }
+
+    private static function isHttpsRequest(): bool
+    {
+        $https = strtolower((string) ($_SERVER['HTTPS'] ?? ''));
+        if ($https === 'on' || $https === '1') {
+            return true;
+        }
+
+        $forwardedProto = strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''));
+        if ($forwardedProto === 'https') {
+            return true;
+        }
+
+        $appUrl = strtolower((string) Environment::get('APP_URL', ''));
+        return str_starts_with($appUrl, 'https://');
     }
     
     /**

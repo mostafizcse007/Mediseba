@@ -524,6 +524,58 @@ function renderTestimonialStars(rating = 5) {
     }).join('');
 }
 
+function normalizeDoctorDisplayName(name = '') {
+    const value = String(name || '').trim();
+    if (!value) {
+        return 'Doctor';
+    }
+
+    return /^dr\.?\s+/i.test(value) ? value : `Dr. ${value}`;
+}
+
+function handleTestimonialAvatarError(image) {
+    if (!(image instanceof HTMLImageElement)) {
+        return;
+    }
+
+    const legacySrc = image.dataset.legacySrc || '';
+    if (legacySrc && !image.dataset.triedLegacy) {
+        image.dataset.triedLegacy = '1';
+        image.src = legacySrc;
+        return;
+    }
+
+    const avatar = image.closest('.testimonial-avatar');
+    if (!avatar) {
+        return;
+    }
+
+    avatar.classList.remove('has-photo');
+    avatar.textContent = image.dataset.initials || 'VP';
+}
+
+function renderTestimonialAvatar(testimonial = {}) {
+    const initials = String(testimonial.initials || 'VP').trim() || 'VP';
+    const photoPath = testimonial.photoPath || '';
+    const resolvedPhotoPath = resolveAssetPath(photoPath);
+    const legacyPhotoPath = resolveLegacyAssetPath(photoPath);
+
+    if (!resolvedPhotoPath) {
+        return `<span class="testimonial-avatar" aria-hidden="true">${escapeHtml(initials)}</span>`;
+    }
+
+    return `
+        <span class="testimonial-avatar has-photo" aria-hidden="true">
+            <img
+                src="${escapeHtml(resolvedPhotoPath)}"
+                alt="${escapeHtml(testimonial.name || 'Verified patient')}"
+                ${legacyPhotoPath ? `data-legacy-src="${escapeHtml(legacyPhotoPath)}"` : ''}
+                data-initials="${escapeHtml(initials)}"
+                onerror="handleTestimonialAvatarError(this)">
+        </span>
+    `;
+}
+
 function stopTestimonialRotation() {
     if (testimonialRotationTimer) {
         window.clearInterval(testimonialRotationTimer);
@@ -559,7 +611,7 @@ function updateTestimonialUI(index = 0) {
         </div>
         <blockquote class="testimonial-quote">"${escapeHtml(testimonial.quote)}"</blockquote>
         <div class="testimonial-author">
-            <span class="testimonial-avatar" aria-hidden="true">${escapeHtml(testimonial.initials)}</span>
+            ${renderTestimonialAvatar(testimonial)}
             <div>
                 <h3>${escapeHtml(testimonial.name)}</h3>
                 <p>${escapeHtml(testimonial.meta)}</p>
@@ -574,7 +626,7 @@ function updateTestimonialUI(index = 0) {
                     <h3>${escapeHtml(item.name)}</h3>
                     <p class="testimonial-card-meta">${escapeHtml(item.meta)}</p>
                 </div>
-                <span class="testimonial-avatar" aria-hidden="true">${escapeHtml(item.initials)}</span>
+                ${renderTestimonialAvatar(item)}
             </div>
             <p>${escapeHtml(item.quote)}</p>
         </article>
@@ -628,9 +680,10 @@ async function initTestimonials() {
             ? reviews.map((review) => ({
                 quote: review.quote || '',
                 name: review.patient_name || 'Verified Patient',
-                meta: `${review.specialty} consultation with Dr. ${review.doctor_name}`,
+                meta: `${review.specialty} consultation with ${normalizeDoctorDisplayName(review.doctor_name)}`,
                 rating: review.rating || 5,
-                initials: review.patient_initials || 'VP'
+                initials: review.patient_initials || 'VP',
+                photoPath: review.patient_profile_photo || ''
             })).filter((review) => review.quote.trim() !== '')
             : [];
     } catch (error) {

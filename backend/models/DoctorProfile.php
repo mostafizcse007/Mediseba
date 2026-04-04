@@ -210,7 +210,8 @@ class DoctorProfile extends Model
                     dp.id AS doctor_id,
                     dp.full_name AS doctor_name,
                     dp.specialty,
-                    pp.full_name AS patient_name
+                    pp.full_name AS patient_name,
+                    pp.profile_photo AS patient_profile_photo
                 FROM doctor_reviews dr
                 INNER JOIN doctor_profiles dp ON dp.id = dr.doctor_id
                 INNER JOIN patient_profiles pp ON pp.id = dr.patient_id
@@ -235,7 +236,10 @@ class DoctorProfile extends Model
                 'doctor_name' => (string) $review['doctor_name'],
                 'specialty' => (string) $review['specialty'],
                 'patient_name' => $this->maskPatientName((string) $review['patient_name']),
-                'patient_initials' => $this->buildPatientInitials((string) $review['patient_name'])
+                'patient_initials' => $this->buildPatientInitials((string) $review['patient_name']),
+                'patient_profile_photo' => !empty($review['patient_profile_photo'])
+                    ? (string) $review['patient_profile_photo']
+                    : null
             ];
         }, $reviews);
     }
@@ -268,8 +272,7 @@ class DoctorProfile extends Model
 
     private function maskPatientName(string $fullName): string
     {
-        $parts = preg_split('/\s+/', trim($fullName)) ?: [];
-        $parts = array_values(array_filter($parts, fn ($part) => $part !== ''));
+        $parts = $this->normalizePatientNameParts($fullName);
 
         if (count($parts) === 0) {
             return 'Verified Patient';
@@ -286,8 +289,7 @@ class DoctorProfile extends Model
 
     private function buildPatientInitials(string $fullName): string
     {
-        $parts = preg_split('/\s+/', trim($fullName)) ?: [];
-        $parts = array_values(array_filter($parts, fn ($part) => $part !== ''));
+        $parts = $this->normalizePatientNameParts($fullName);
 
         if (count($parts) === 0) {
             return 'VP';
@@ -298,6 +300,39 @@ class DoctorProfile extends Model
         }
 
         return strtoupper(substr($parts[0], 0, 1) . substr((string) end($parts), 0, 1));
+    }
+
+    /**
+     * Normalize patient names so testimonials avoid title-only labels like "MD. A."
+     *
+     * @return string[]
+     */
+    private function normalizePatientNameParts(string $fullName): array
+    {
+        $rawParts = preg_split('/\s+/', trim($fullName)) ?: [];
+        $parts = array_values(array_filter(array_map(function (string $part): string {
+            $cleaned = trim($part);
+            $cleaned = preg_replace('/[^A-Za-z0-9\'\-\.]/', '', $cleaned) ?? '';
+
+            if ($cleaned === '') {
+                return '';
+            }
+
+            return ucwords(strtolower($cleaned), "-'");
+        }, $rawParts), static fn (string $part): bool => $part !== ''));
+
+        $prefixes = ['md', 'md.', 'dr', 'dr.', 'mr', 'mr.', 'mrs', 'mrs.', 'ms', 'ms.', 'miss', 'prof', 'prof.'];
+
+        while (count($parts) > 1) {
+            $first = strtolower($parts[0]);
+            if (!in_array($first, $prefixes, true)) {
+                break;
+            }
+
+            array_shift($parts);
+        }
+
+        return $parts;
     }
     
     /**

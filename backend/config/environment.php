@@ -150,6 +150,7 @@ class Environment
             'username' => self::get('DB_USERNAME'),
             'password' => self::get('DB_PASSWORD'),
             'charset' => self::get('DB_CHARSET'),
+            'timezone' => self::get('APP_TIMEZONE'),
             'debug' => self::get('APP_DEBUG') === 'true'
         ];
     }

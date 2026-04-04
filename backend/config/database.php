@@ -32,6 +32,7 @@ class Database
             'password' => '',
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
+            'timezone' => 'UTC',
             'persistent' => true,
             'debug' => false
         ], $config);
@@ -96,9 +97,37 @@ class Database
                 self::$config['password'],
                 $options
             );
+
+            self::applySessionConfiguration();
         } catch (PDOException $e) {
             error_log("Database connection failed: " . $e->getMessage());
             throw new Exception('Database connection failed. Please try again later.');
+        }
+    }
+
+    /**
+     * Apply connection-level settings after the PDO handle is created.
+     */
+    private static function applySessionConfiguration(): void
+    {
+        if (self::$instance === null) {
+            return;
+        }
+
+        $offset = self::resolveMysqlTimezoneOffset((string) (self::$config['timezone'] ?? 'UTC'));
+        self::$instance->exec("SET time_zone = " . self::$instance->quote($offset));
+    }
+
+    /**
+     * Convert a PHP timezone identifier to a MySQL-compatible UTC offset.
+     */
+    private static function resolveMysqlTimezoneOffset(string $timezone): string
+    {
+        try {
+            $dateTime = new \DateTimeImmutable('now', new \DateTimeZone($timezone));
+            return $dateTime->format('P');
+        } catch (\Throwable $e) {
+            return '+00:00';
         }
     }
     

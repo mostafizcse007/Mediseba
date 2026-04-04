@@ -5,6 +5,7 @@ let chatPollingTimer = null;
 let chatInitialLoadComplete = false;
 let chatRequestInFlight = false;
 let chatCanSendMessages = false;
+const CHAT_DISPLAY_TIMEZONE = 'Asia/Dhaka';
 
 function normalizeChatRole(role) {
     return String(role || '').trim().toLowerCase();
@@ -55,14 +56,12 @@ function formatChatTimestamp(dateString) {
     }
 
     const now = new Date();
-    const isSameDay =
-        date.getFullYear() === now.getFullYear() &&
-        date.getMonth() === now.getMonth() &&
-        date.getDate() === now.getDate();
+    const isSameDay = getChatCalendarKey(date) === getChatCalendarKey(now);
 
     const timePart = date.toLocaleString('en-BD', {
         hour: 'numeric',
-        minute: '2-digit'
+        minute: '2-digit',
+        timeZone: CHAT_DISPLAY_TIMEZONE
     });
 
     if (isSameDay) {
@@ -71,10 +70,20 @@ function formatChatTimestamp(dateString) {
 
     const datePart = date.toLocaleString('en-BD', {
         month: 'short',
-        day: 'numeric'
+        day: 'numeric',
+        timeZone: CHAT_DISPLAY_TIMEZONE
     });
 
     return `${datePart} · ${timePart}`;
+}
+
+function getChatCalendarKey(date) {
+    return date.toLocaleDateString('en-CA', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        timeZone: CHAT_DISPLAY_TIMEZONE
+    });
 }
 
 function getChatMessageRoleClass(message) {

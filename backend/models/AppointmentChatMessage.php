@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace MediSeba\Models;
 
+use MediSeba\Config\Environment;
+
 class AppointmentChatMessage extends Model
 {
     protected string $table = 'appointment_chat_messages';
@@ -137,7 +139,26 @@ class AppointmentChatMessage extends Model
         $message['message_text'] = (string) ($message['message_text'] ?? '');
         $message['sender_name'] = trim((string) ($message['sender_name'] ?? 'User')) ?: 'User';
         $message['sender_profile_photo'] = (string) ($message['sender_profile_photo'] ?? '');
+        $message['created_at'] = $this->normalizeCreatedAt($message['created_at'] ?? null);
 
         return $message;
+    }
+
+    private function normalizeCreatedAt(mixed $value): string
+    {
+        if ($value === null || $value === '') {
+            return '';
+        }
+
+        try {
+            $timezone = new \DateTimeZone((string) Environment::get('APP_TIMEZONE', 'Asia/Dhaka'));
+            $date = $value instanceof \DateTimeInterface
+                ? \DateTimeImmutable::createFromInterface($value)->setTimezone($timezone)
+                : new \DateTimeImmutable((string) $value, $timezone);
+
+            return $date->format(\DateTimeInterface::ATOM);
+        } catch (\Throwable $e) {
+            return (string) $value;
+        }
     }
 }

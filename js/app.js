@@ -14,6 +14,8 @@ function escapeHtml(str) {
 
 const THEME_STORAGE_KEY = 'mediseba_theme';
 const TESTIMONIAL_ROTATION_MS = 7000;
+const FAVICON_SVG_PATH = 'images/logo-mark.svg';
+const FAVICON_PNG_PATH = 'images/hero-brand.png';
 
 let testimonialRotationTimer = null;
 let activeTestimonialIndex = 0;
@@ -84,6 +86,43 @@ function applyTheme(theme, persist = true) {
 
     updateThemeToggleButton(resolvedTheme);
     return resolvedTheme;
+}
+
+function ensureFavicon() {
+    if (typeof document === 'undefined' || !document.head) {
+        return;
+    }
+
+    const faviconLinks = [
+        {
+            selector: 'link[data-mediseba-favicon="svg"]',
+            rel: 'icon',
+            type: 'image/svg+xml',
+            href: FAVICON_SVG_PATH,
+            token: 'svg'
+        },
+        {
+            selector: 'link[data-mediseba-favicon="png"]',
+            rel: 'icon',
+            type: 'image/png',
+            href: FAVICON_PNG_PATH,
+            token: 'png'
+        }
+    ];
+
+    faviconLinks.forEach((config) => {
+        let link = document.head.querySelector(config.selector);
+
+        if (!link) {
+            link = document.createElement('link');
+            link.setAttribute('data-mediseba-favicon', config.token);
+            document.head.appendChild(link);
+        }
+
+        link.rel = config.rel;
+        link.type = config.type;
+        link.href = config.href;
+    });
 }
 
 function toggleTheme() {
@@ -1017,6 +1056,7 @@ async function loadUpcomingAppointments() {
 
 // Initialize page
 function initPage() {
+    ensureFavicon();
     ensureThemeToggle();
     initMobileNav();
     makeIconsDecorative();

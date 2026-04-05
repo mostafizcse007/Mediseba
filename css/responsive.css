@@ -72,6 +72,79 @@
     }
 }
 
+@media (max-width: 900px) {
+    .top-header,
+    .page-header,
+    .card-header,
+    .filter-bar,
+    .patient-dashboard-upcoming-summary,
+    .patient-appointments-toolbar,
+    .patient-prescriptions-toolbar,
+    .patient-payments-toolbar,
+    .doctor-queue-toolbar,
+    .doctor-queue-summary,
+    .doctor-schedule-editor-toolbar,
+    .doctor-schedule-slot-header,
+    .doctor-followup-card-header {
+        align-items: stretch;
+    }
+
+    .top-header .page-intro,
+    .top-header .header-actions,
+    .page-header > *,
+    .card-header > *,
+    .filter-bar > * {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .top-header .header-actions,
+    .page-header .header-actions,
+    .page-header .action-row,
+    .card-header .table-actions,
+    .filter-bar-actions,
+    .dashboard-header-tools {
+        margin-left: 0;
+        justify-content: flex-start;
+    }
+
+    .filter-bar-fields,
+    .doctor-filter-controls,
+    .patient-filter-controls {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .doctor-filter-field,
+    .patient-filter-field {
+        flex: 1 1 220px;
+        min-width: min(100%, 220px);
+    }
+
+    .patient-dashboard-cta {
+        justify-items: start;
+    }
+
+    .patient-dashboard-cta-copy {
+        text-align: left;
+    }
+
+    .patient-dashboard-cta-actions,
+    .doctor-schedule-editor-actions {
+        justify-content: flex-start;
+    }
+
+    .patient-dashboard-upcoming-summary > *,
+    .patient-appointments-toolbar > *,
+    .patient-prescriptions-toolbar > *,
+    .patient-payments-toolbar > *,
+    .doctor-queue-toolbar > *,
+    .doctor-queue-summary > *,
+    .doctor-schedule-editor-toolbar > * {
+        min-width: 0;
+    }
+}
+
 /* Tablet (768px and below) */
 @media (max-width: 768px) {
     body.sidebar-open {
@@ -606,6 +679,36 @@
         padding: var(--space-3) !important;
     }
 
+    .top-header,
+    .page-header {
+        gap: var(--space-3);
+    }
+
+    .top-header .page-intro,
+    .top-header .header-actions,
+    .page-header > *,
+    .dashboard-header-tools,
+    .header-search {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .header-actions,
+    .dashboard-header-tools {
+        margin-left: 0;
+        justify-content: flex-start;
+    }
+
+    .page-header .action-row,
+    .page-header .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
     .card-header,
     .card-body,
     .filter-bar {
@@ -622,9 +725,70 @@
         grid-template-columns: 1fr;
     }
 
+    .doctor-profile-identity-grid,
+    .patient-profile-identity-grid,
+    .doctor-schedule-slot-grid {
+        grid-template-columns: 1fr;
+    }
+
     .profile-photo-preview {
         width: 112px;
         height: 112px;
+    }
+
+    .profile-photo-grid-account .profile-account-copy,
+    .profile-photo-grid-editor .profile-photo-copy,
+    .profile-photo-grid-account .profile-photo-card,
+    .profile-photo-grid-editor .profile-photo-card {
+        justify-items: center;
+        text-align: center;
+    }
+
+    .doctor-profile-meta,
+    .patient-profile-meta {
+        justify-content: center;
+    }
+
+    .doctor-profile-summary,
+    .patient-profile-summary {
+        text-align: center;
+    }
+
+    .patient-profile-info-card .card-header,
+    .doctor-profile-info-card .card-header {
+        align-items: flex-start;
+    }
+
+    .patient-profile-edit-btn,
+    .doctor-profile-edit-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .patient-dashboard-stats .stat-card,
+    .doctor-profile-stat-grid .stat-card,
+    .patient-profile-stat-grid .stat-card {
+        min-height: auto;
+    }
+
+    .patient-dashboard-upcoming-summary,
+    .patient-appointments-toolbar,
+    .patient-prescriptions-toolbar,
+    .patient-payments-toolbar,
+    .doctor-queue-toolbar,
+    .doctor-queue-summary,
+    .doctor-schedule-editor-toolbar {
+        padding: var(--space-4);
+    }
+
+    .patient-dashboard-upcoming-status .table-meta-text,
+    .doctor-queue-status .table-meta-text,
+    .doctor-appointments-status .table-meta-text,
+    .doctor-person-meta .table-meta-text,
+    .patient-appointments-status .table-meta-text,
+    .patient-appointments-payment .table-meta-text,
+    .patient-payments-status .table-meta-text {
+        max-width: none;
     }
 
     .table-responsive {
@@ -633,7 +797,7 @@
     }
 
     .table-responsive table {
-        min-width: 560px;
+        min-width: 520px;
     }
     
     /* Toast */
@@ -644,6 +808,43 @@
     
     .toast {
         max-width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .top-header,
+    .page-header,
+    .card-header,
+    .filter-bar {
+        gap: var(--space-3);
+    }
+
+    .header-actions .btn,
+    .page-header .btn,
+    .patient-dashboard-cta-actions .btn,
+    .doctor-schedule-editor-actions .btn,
+    .doctor-filter-actions .btn,
+    .patient-filter-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .patient-dashboard-cta-actions,
+    .doctor-schedule-editor-actions,
+    .doctor-filter-actions,
+    .patient-filter-actions {
+        width: 100%;
+    }
+
+    .card-header,
+    .card-body,
+    .filter-bar {
+        padding-left: var(--space-3);
+        padding-right: var(--space-3);
+    }
+
+    .table-responsive table {
+        min-width: 460px;
     }
 }
 

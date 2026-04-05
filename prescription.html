@@ -44,6 +44,56 @@
             padding: var(--space-6);
         }
 
+        .detail-shell-subtitle {
+            color: var(--gray-500);
+            margin-top: var(--space-1);
+        }
+
+        .detail-shell-actions {
+            display: flex;
+            gap: var(--space-3);
+            flex-wrap: wrap;
+        }
+
+        .detail-content-stack {
+            display: grid;
+            gap: var(--space-6);
+        }
+
+        .detail-top-row {
+            display: flex;
+            justify-content: space-between;
+            gap: var(--space-4);
+            flex-wrap: wrap;
+        }
+
+        .detail-top-row > * {
+            min-width: 0;
+        }
+
+        .detail-side-meta {
+            text-align: right;
+        }
+
+        .detail-split-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: var(--space-4);
+        }
+
+        .detail-info-card {
+            padding: var(--space-5);
+        }
+
+        .detail-info-card.is-muted {
+            background: var(--gray-50);
+        }
+
+        .detail-medicine-list {
+            display: grid;
+            gap: var(--space-3);
+        }
+
         @media (max-width: 768px) {
             .detail-shell-content {
                 padding: var(--space-4);
@@ -52,18 +102,44 @@
             .detail-shell-card {
                 padding: var(--space-4);
             }
+
+            .detail-shell-actions,
+            .detail-top-row,
+            .detail-side-meta {
+                text-align: left;
+            }
+
+            .detail-shell-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .detail-shell-content {
+                padding: var(--space-3);
+            }
+
+            .detail-shell-card,
+            .detail-info-card {
+                padding: var(--space-4);
+            }
+
+            .detail-split-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
-<body class="detail-shell" style="margin: 0;">
-    <div class="detail-shell-content" style="width: 100%; max-width: 1280px; margin: 0 auto; box-sizing: border-box; padding: var(--space-6);">
+<body class="detail-shell detail-page" style="margin: 0;">
+    <div class="detail-shell-content">
         <main>
             <div class="page-header" style="margin-bottom: var(--space-6);">
                 <div>
                     <h1>Prescription Details</h1>
-                    <p style="color: var(--gray-500); margin-top: var(--space-1);">Review medicines, diagnosis, and follow-up guidance.</p>
+                    <p class="detail-shell-subtitle">Review medicines, diagnosis, and follow-up guidance.</p>
                 </div>
-                <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
+                <div class="detail-shell-actions">
                     <button type="button" class="btn btn-primary" id="downloadPdfButton" disabled>
                         <i class="fas fa-file-pdf"></i>
                         Download PDF
@@ -102,11 +178,11 @@
             }
 
             return `
-                <div style="display: grid; gap: var(--space-3);">
+                <div class="detail-medicine-list">
                     ${medicineList.map((medicine, index) => {
                         const item = typeof medicine === 'string' ? { name: medicine } : medicine;
                         return `
-                            <div class="card" style="padding: var(--space-4); background: var(--gray-50);">
+                            <div class="card detail-info-card is-muted">
                                 <strong>${index + 1}. ${escapeHtml(item.name || 'Medicine')}</strong>
                                 <p style="margin-top: var(--space-1); color: var(--gray-600);">${escapeHtml(item.dosage || item.strength || item.instructions || 'Dosage details not provided')}</p>
                             </div>
@@ -155,49 +231,49 @@
                 downloadButton.disabled = false;
 
                 container.innerHTML = `
-                    <div style="display: grid; gap: var(--space-6);">
-                        <div style="display: flex; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap;">
+                    <div class="detail-content-stack">
+                        <div class="detail-top-row">
                             <div>
                                 <p style="color: var(--gray-500); font-size: var(--font-size-sm);">Prescription Number</p>
                                 <h2>${escapeHtml(prescription.prescription_number || '')}</h2>
                                 <p style="margin-top: var(--space-2); color: var(--gray-600);">${escapeHtml(prescription.doctor_name || '')} • ${escapeHtml(prescription.specialty || '')}</p>
                             </div>
-                            <div style="text-align: right;">
+                            <div class="detail-side-meta">
                                 <p style="color: var(--gray-500); font-size: var(--font-size-sm);">Issued On</p>
                                 <strong>${formatDate(prescription.created_at)}</strong>
                             </div>
                         </div>
 
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-4);">
-                            <div class="card" style="padding: var(--space-5);">
+                        <div class="detail-split-grid">
+                            <div class="card detail-info-card">
                                 <h3>Symptoms</h3>
                                 <p style="margin-top: var(--space-2); color: var(--gray-600);">${escapeHtml(prescription.symptoms || 'Not recorded')}</p>
                             </div>
-                            <div class="card" style="padding: var(--space-5);">
+                            <div class="card detail-info-card">
                                 <h3>Diagnosis</h3>
                                 <p style="margin-top: var(--space-2); color: var(--gray-600);">${escapeHtml(prescription.diagnosis || 'Not recorded')}</p>
                             </div>
                         </div>
 
-                        <div class="card" style="padding: var(--space-5);">
+                        <div class="card detail-info-card">
                             <h3>Medicines</h3>
                             <div style="margin-top: var(--space-4);">
                                 ${renderMedicines(prescription.medicine_list)}
                             </div>
                         </div>
 
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-4);">
-                            <div class="card" style="padding: var(--space-5);">
+                        <div class="detail-split-grid">
+                            <div class="card detail-info-card">
                                 <h3>Dosage Instructions</h3>
                                 <p style="margin-top: var(--space-2); color: var(--gray-600);">${escapeHtml(prescription.dosage_instructions || 'No additional instructions')}</p>
                             </div>
-                            <div class="card" style="padding: var(--space-5);">
+                            <div class="card detail-info-card">
                                 <h3>Advice</h3>
                                 <p style="margin-top: var(--space-2); color: var(--gray-600);">${escapeHtml(prescription.advice || 'No extra advice')}</p>
                             </div>
                         </div>
 
-                        <div class="card" style="padding: var(--space-5); background: var(--gray-50);">
+                        <div class="card detail-info-card is-muted">
                             <h3>Follow-up</h3>
                             <p style="margin-top: var(--space-2); color: var(--gray-600);">${prescription.follow_up_date ? formatDate(prescription.follow_up_date) : 'No follow-up date scheduled'}</p>
                             <p style="margin-top: var(--space-2); color: var(--gray-600);">${escapeHtml(prescription.follow_up_notes || '')}</p>

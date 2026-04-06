@@ -4170,6 +4170,17 @@ body.modal-open {
 
     .review-modal {
         padding: var(--space-4);
+        align-items: flex-start;
+        overflow-y: auto;
+    }
+
+    .review-modal-dialog {
+        width: 100%;
+        max-width: min(100%, 34rem);
+        max-height: calc(100vh - (var(--space-4) * 2));
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+        margin-block: auto;
     }
 
     .review-modal-header,
@@ -4179,6 +4190,11 @@ body.modal-open {
 
     .review-modal-context {
         grid-template-columns: minmax(0, 1fr);
+    }
+
+    .review-modal-body {
+        overflow-y: auto;
+        min-height: 0;
     }
 
     .review-modal-footer-note {
@@ -4973,6 +4989,41 @@ body.modal-open {
 }
 
 @media (max-width: 640px) {
+    .review-modal {
+        padding: var(--space-3);
+    }
+
+    .review-modal-dialog {
+        max-height: calc(100vh - (var(--space-3) * 2));
+        border-radius: var(--radius-2xl);
+    }
+
+    .review-modal-header,
+    .review-modal-body {
+        padding: var(--space-4);
+    }
+
+    .review-rating-picker {
+        gap: var(--space-2);
+    }
+
+    .review-star {
+        width: 2.75rem;
+        height: 2.75rem;
+    }
+
+    .review-modal .form-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+    }
+
+    .review-modal .form-actions .btn {
+        width: 100%;
+        max-width: 100%;
+        justify-content: center;
+    }
+
     .auth-form-container {
         padding-bottom: calc(var(--space-4) + 84px);
     }

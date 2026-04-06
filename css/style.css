@@ -1892,6 +1892,12 @@ section {
     box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2), var(--shadow-xl);
 }
 
+body.modal-open .theme-toggle {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+}
+
 .theme-toggle-icon {
     width: 36px;
     height: 36px;

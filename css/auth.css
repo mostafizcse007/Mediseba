@@ -4218,6 +4218,8 @@ body.modal-open {
     .doctor-appointments-table,
     .doctor-prescription-history-table,
     .doctor-schedule-editor-table {
+        margin-inline: 0;
+        padding-inline: 0;
         overflow: visible;
     }
 
@@ -4231,6 +4233,7 @@ body.modal-open {
     .doctor-schedule-editor-table tbody {
         display: block;
         width: 100%;
+        min-width: 0 !important;
     }
 
     .doctor-queue-table thead,
@@ -4378,8 +4381,8 @@ body.modal-open {
     .doctor-queue-table .table-actions .btn,
     .doctor-appointments-table .table-actions .btn,
     .doctor-prescription-history-table .table-actions .btn {
-        flex: 1 1 calc(50% - var(--space-2));
-        min-width: calc(50% - var(--space-2));
+        flex: 1 1 100%;
+        min-width: 100%;
         justify-content: center;
     }
 
@@ -4435,6 +4438,8 @@ body.modal-open {
     .patient-appointments-table,
     .patient-payments-table,
     .patient-dashboard-prescriptions-table {
+        margin-inline: 0;
+        padding-inline: 0;
         overflow: visible;
     }
 
@@ -4448,6 +4453,7 @@ body.modal-open {
     .patient-dashboard-prescriptions-table tbody {
         display: block;
         width: 100%;
+        min-width: 0 !important;
     }
 
     .patient-dashboard-upcoming-table thead,
@@ -4605,8 +4611,8 @@ body.modal-open {
     .patient-appointments-table .table-actions .btn,
     .patient-payments-table .table-actions .btn,
     .patient-dashboard-prescriptions-table .table-actions .btn {
-        flex: 1 1 calc(50% - var(--space-2));
-        min-width: calc(50% - var(--space-2));
+        flex: 1 1 100%;
+        min-width: 100%;
         justify-content: center;
     }
 
@@ -4963,5 +4969,104 @@ body.modal-open {
 
     .auth-side-tagline {
         display: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .auth-form-container {
+        padding-bottom: calc(var(--space-4) + 84px);
+    }
+
+    .auth-image {
+        padding-bottom: calc(var(--space-5) + 84px);
+    }
+
+    .dashboard-content,
+    .page-content {
+        padding-bottom: calc(var(--space-6) + 84px) !important;
+    }
+
+    .dashboard-content > *,
+    .page-content > *,
+    .auth-form-wrapper,
+    .auth-image-shell,
+    .patient-profile-hero,
+    .doctor-profile-hero,
+    .patient-profile-info-card,
+    .doctor-profile-info-card,
+    .card {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .patient-dashboard-upcoming-table,
+    .patient-appointments-table,
+    .patient-payments-table,
+    .patient-dashboard-prescriptions-table,
+    .doctor-queue-table,
+    .doctor-appointments-table,
+    .doctor-prescription-history-table,
+    .doctor-schedule-editor-table,
+    .table-responsive {
+        width: 100%;
+        max-width: 100%;
+        margin-inline: 0 !important;
+        padding-inline: 0 !important;
+        overflow: visible !important;
+    }
+
+    .patient-dashboard-upcoming-table tr,
+    .patient-appointments-table tr,
+    .patient-payments-table tr,
+    .patient-dashboard-prescriptions-table tr,
+    .doctor-queue-table tr,
+    .doctor-appointments-table tr,
+    .doctor-prescription-history-table tr,
+    .doctor-schedule-editor-table tr {
+        overflow: hidden;
+    }
+
+    .patient-dashboard-upcoming-table .table-actions,
+    .patient-appointments-table .table-actions,
+    .patient-payments-table .table-actions,
+    .patient-dashboard-prescriptions-table .table-actions,
+    .doctor-queue-table .table-actions,
+    .doctor-appointments-table .table-actions,
+    .doctor-prescription-history-table .table-actions,
+    #appointmentPagination {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+        gap: var(--space-3);
+        justify-content: stretch;
+    }
+
+    .patient-dashboard-upcoming-table .table-actions .btn,
+    .patient-appointments-table .table-actions .btn,
+    .patient-payments-table .table-actions .btn,
+    .patient-dashboard-prescriptions-table .table-actions .btn,
+    .doctor-queue-table .table-actions .btn,
+    .doctor-appointments-table .table-actions .btn,
+    .doctor-prescription-history-table .table-actions .btn,
+    #appointmentPagination .btn {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        justify-content: center;
+    }
+
+    .patient-prescription-mobile-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+    }
+
+    .patient-prescription-mobile-actions .btn {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .review-modal-dialog {
+        max-width: calc(100vw - (var(--space-3) * 2));
     }
 }

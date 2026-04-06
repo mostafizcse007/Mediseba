@@ -1969,6 +1969,21 @@ section {
     }
 }
 
+@media (max-width: 640px) {
+    .theme-toggle {
+        right: var(--space-3);
+        bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+        padding: 0.375rem;
+        box-shadow: var(--shadow-md);
+    }
+
+    .theme-toggle-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 0.92rem;
+    }
+}
+
 @keyframes slideIn {
     from {
         transform: translateX(100%);

@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - MediSeba</title>
+    <meta name="description" content="Admin dashboard for doctor verification in MediSeba.">
+    <link rel="stylesheet" href="css/style.css?v=20260415-2">
+    <link rel="stylesheet" href="css/responsive.css?v=20260404-2">
+    <link rel="stylesheet" href="css/auth.css?v=20260414-1">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-page admin-dashboard-page">
+    <div class="dashboard-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo" aria-label="MediSeba home">
+    <img src="images/logo-mark.svg" alt="" class="logo-mark">
+    <span class="logo-wordmark" aria-hidden="true"><span class="logo-wordmark-primary">Medi</span><span class="logo-wordmark-secondary">Seba</span></span>
+</a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="admin-dashboard.html" class="active">
+                            <i class="fas fa-user-shield"></i>
+                            Doctor Verification
+                        </a>
+                    </li>
+                    <li>
+                        <a href="index.html">
+                            <i class="fas fa-globe"></i>
+                            Public Website
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="user-details">
+                        <span class="user-name" id="userName">Admin</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="Auth.logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="page-intro">
+                    <h2>Doctor Verification Dashboard</h2>
+                    <p class="page-intro-text">Approve or reject doctor profiles from one admin queue without database edits.</p>
+                </div>
+
+                <div class="header-actions action-row">
+                    <button class="nav-toggle" id="navToggle" onclick="toggleSidebar()" aria-label="Toggle Navigation" style="display: none;">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <button class="btn btn-outline btn-sm" type="button" id="refreshQueueButton">
+                        <i class="fas fa-rotate-right"></i>
+                        Refresh
+                    </button>
+                </div>
+            </header>
+
+            <div class="dashboard-content admin-dashboard-content">
+                <div class="stats-grid admin-stats-grid" id="adminSummaryStats">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div>
+                                <p class="stat-card-title">Pending</p>
+                                <p class="stat-card-value">-</p>
+                                <p class="admin-stat-meta">Doctor profiles waiting for review.</p>
+                            </div>
+                            <div class="stat-card-icon warning">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div>
+                                <p class="stat-card-title">Approved</p>
+                                <p class="stat-card-value">-</p>
+                                <p class="admin-stat-meta">Profiles available on the public doctor directory.</p>
+                            </div>
+                            <div class="stat-card-icon success">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div>
+                                <p class="stat-card-title">Rejected</p>
+                                <p class="stat-card-value">-</p>
+                                <p class="admin-stat-meta">Profiles currently blocked from verification.</p>
+                            </div>
+                            <div class="stat-card-icon danger">
+                                <i class="fas fa-user-slash"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="card admin-queue-card">
+                    <div class="card-header">
+                        <div class="card-header-copy">
+                            <h3>Verification Queue</h3>
+                            <p class="card-header-meta">Filter by status or search by name, email, specialty, and registration number.</p>
+                        </div>
+                        <span class="token-badge" id="queueCountBadge">Loading...</span>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="admin-filter-bar" id="adminFilterBar">
+                            <div class="input-group admin-filter-search">
+                                <span class="input-group-icon"><i class="fas fa-search"></i></span>
+                                <input type="search" class="form-input" id="adminSearchInput" placeholder="Search doctor, email, specialty, registration...">
+                            </div>
+                            <select id="adminStatusFilter" class="form-select admin-filter-status" aria-label="Filter doctor queue by status">
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                                <option value="all">All</option>
+                            </select>
+                            <button type="button" class="btn btn-outline btn-sm" id="clearFilterButton">
+                                <i class="fas fa-filter-circle-xmark"></i>
+                                Clear
+                            </button>
+                        </div>
+
+                        <div id="adminQueueContainer" class="admin-queue-container">
+                            <div class="empty-state">
+                                <div class="spinner"></div>
+                                <p>Loading doctor queue...</p>
+                            </div>
+                        </div>
+
+                        <div class="pagination admin-pagination" id="adminQueuePagination"></div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/api.js?v=20260414-1"></script>
+    <script src="js/auth.js?v=20260414-1"></script>
+    <script src="js/app.js?v=20260415-2"></script>
+    <script>
+        if (!Auth.requireRole('admin')) {
+            throw new Error('Admin access required');
+        }
+
+        const adminQueueState = {
+            page: 1,
+            perPage: 12,
+            status: 'pending',
+            search: ''
+        };
+
+        let adminQueueSearchDebounce = null;
+
+        function getDoctorQueueStatusBadge(status) {
+            const normalized = String(status || 'pending').toLowerCase();
+            const label = normalized.charAt(0).toUpperCase() + normalized.slice(1);
+            return `<span class="status-badge admin-status-${escapeHtml(normalized)}">${escapeHtml(label)}</span>`;
+        }
+
+        function renderDoctorAvatar(name, photoPath) {
+            const displayName = String(name || 'Doctor').trim() || 'Doctor';
+            const resolvedPhotoPath = resolveAssetPath(photoPath || '');
+            const legacyPhotoPath = resolveLegacyAssetPath(photoPath || '');
+
+            if (resolvedPhotoPath) {
+                return `
+                    <div class="user-avatar doctor-person-avatar has-photo" data-name="${escapeHtml(displayName)}" data-fallback-icon="fa-user-md">
+                        <img src="${escapeHtml(resolvedPhotoPath)}"
+                             ${legacyPhotoPath ? `data-legacy-src="${escapeHtml(legacyPhotoPath)}"` : ''}
+                             data-name="${escapeHtml(displayName)}"
+                             data-fallback-icon="fa-user-md"
+                             alt="${escapeHtml(displayName)}"
+                             onerror="handleAssetImageError(this)">
+                    </div>
+                `;
+            }
+
+            return `<div class="user-avatar doctor-person-avatar" aria-hidden="true">${escapeHtml(buildAvatarInitial(displayName, 'D'))}</div>`;
+        }
+
+        function renderAdminSummary(summary = {}) {
+            const container = document.getElementById('adminSummaryStats');
+            if (!container) {
+                return;
+            }
+
+            const pending = Number(summary.pending || 0);
+            const approved = Number(summary.approved || 0);
+            const rejected = Number(summary.rejected || 0);
+
+            container.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <p class="stat-card-title">Pending</p>
+                            <p class="stat-card-value">${pending}</p>
+                            <p class="admin-stat-meta">Doctor profiles waiting for review.</p>
+                        </div>
+                        <div class="stat-card-icon warning">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <p class="stat-card-title">Approved</p>
+                            <p class="stat-card-value">${approved}</p>
+                            <p class="admin-stat-meta">Profiles available on the public doctor directory.</p>
+                        </div>
+                        <div class="stat-card-icon success">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <p class="stat-card-title">Rejected</p>
+                            <p class="stat-card-value">${rejected}</p>
+                            <p class="admin-stat-meta">Profiles currently blocked from verification.</p>
+                        </div>
+                        <div class="stat-card-icon danger">
+                            <i class="fas fa-user-slash"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderQueueTable(items = []) {
+            const container = document.getElementById('adminQueueContainer');
+            if (!container) {
+                return;
+            }
+
+            if (!items.length) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <h3>No doctors found</h3>
+                        <p>Try another search term or switch the filter status.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="table-responsive">
+                    <table class="table admin-queue-table">
+                        <thead>
+                            <tr>
+                                <th>Doctor</th>
+                                <th>Professional Details</th>
+                                <th>Status</th>
+                                <th>Submitted</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${items.map((doctor) => `
+                                <tr>
+                                    <td>
+                                        <div class="doctor-person-meta">
+                                            ${renderDoctorAvatar(doctor.full_name, doctor.profile_photo)}
+                                            <div class="table-meta">
+                                                <div class="table-meta-strong">${escapeHtml(doctor.full_name)}</div>
+                                                <div class="table-meta-text">${escapeHtml(doctor.user_email)}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="table-meta">
+                                            <div class="table-meta-strong">${escapeHtml(doctor.specialty)} • ${escapeHtml(String(doctor.experience_years))} yrs</div>
+                                            <div class="table-meta-text">${escapeHtml(doctor.qualification)}</div>
+                                            <div class="table-meta-text">Registration: ${escapeHtml(doctor.registration_number || 'Not provided')}</div>
+                                            <div class="table-meta-text">Fee: ৳${escapeHtml(Number(doctor.consultation_fee || 0).toFixed(0))}</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="table-meta">
+                                            ${getDoctorQueueStatusBadge(doctor.queue_status)}
+                                            <div class="table-meta-text">User status: ${escapeHtml(doctor.user_status)}</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="table-date">
+                                            <span>${formatDate(doctor.created_at)}</span>
+                                            <span>${formatDate(doctor.updated_at, { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="table-actions admin-action-row">
+                                            <button type="button" class="btn btn-sm btn-primary" onclick="approveDoctor(${Number(doctor.id)}, '${escapeHtml(doctor.full_name).replace(/'/g, "\\'")}')">
+                                                <i class="fas fa-check"></i>
+                                                Approve
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline btn-danger" onclick="rejectDoctor(${Number(doctor.id)}, '${escapeHtml(doctor.full_name).replace(/'/g, "\\'")}')">
+                                                <i class="fas fa-ban"></i>
+                                                Reject
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderQueuePagination(pagination = {}) {
+            const container = document.getElementById('adminQueuePagination');
+            if (!container) {
+                return;
+            }
+
+            const totalPages = Number(pagination.total_pages || 1);
+            const currentPage = Number(pagination.current_page || 1);
+
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const prevDisabled = currentPage <= 1 ? 'disabled' : '';
+            const nextDisabled = currentPage >= totalPages ? 'disabled' : '';
+
+            container.innerHTML = `
+                <button type="button" class="btn btn-outline" ${prevDisabled} onclick="goToQueuePage(${currentPage - 1})">Previous</button>
+                <span class="pagination-summary">Page ${currentPage} of ${totalPages}</span>
+                <button type="button" class="btn btn-outline" ${nextDisabled} onclick="goToQueuePage(${currentPage + 1})">Next</button>
+            `;
+        }
+
+        async function loadDoctorQueue() {
+            const queueContainer = document.getElementById('adminQueueContainer');
+            const queueCountBadge = document.getElementById('queueCountBadge');
+
+            queueContainer.innerHTML = `
+                <div class="empty-state">
+                    <div class="spinner"></div>
+                    <p>Loading doctor queue...</p>
+                </div>
+            `;
+
+            try {
+                const result = await API.admin.doctorQueue({
+                    page: adminQueueState.page,
+                    per_page: adminQueueState.perPage,
+                    status: adminQueueState.status,
+                    search: adminQueueState.search
+                });
+
+                const items = result.items || [];
+                const pagination = result.pagination || {};
+                const summary = result.summary || {};
+
+                queueCountBadge.textContent = `${pagination.total || items.length} record(s)`;
+                renderAdminSummary(summary);
+                renderQueueTable(items);
+                renderQueuePagination(pagination);
+            } catch (error) {
+                queueCountBadge.textContent = 'Unavailable';
+                queueContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-circle-exclamation"></i>
+                        </div>
+                        <h3>Unable to load queue</h3>
+                        <p>${escapeHtml(error.message || 'Please try again later.')}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function approveDoctor(doctorId, doctorName) {
+            const confirmed = window.confirm(`Approve ${doctorName} as a verified doctor?`);
+            if (!confirmed) {
+                return;
+            }
+
+            showLoading();
+
+            try {
+                await API.admin.approveDoctor(doctorId, {});
+                showToast(`${doctorName} was approved.`, 'success');
+                await loadDoctorQueue();
+            } catch (error) {
+                showToast(error.message || 'Failed to approve doctor.', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function rejectDoctor(doctorId, doctorName) {
+            const note = window.prompt(`Reject ${doctorName}. Add a note (optional):`, '');
+            if (note === null) {
+                return;
+            }
+
+            showLoading();
+
+            try {
+                await API.admin.rejectDoctor(doctorId, { note: String(note || '').trim() });
+                showToast(`${doctorName} was rejected.`, 'warning');
+                await loadDoctorQueue();
+            } catch (error) {
+                showToast(error.message || 'Failed to reject doctor.', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function goToQueuePage(page) {
+            const nextPage = Number(page);
+            if (!Number.isFinite(nextPage) || nextPage < 1) {
+                return;
+            }
+
+            adminQueueState.page = nextPage;
+            loadDoctorQueue();
+        }
+
+        function bindAdminFilters() {
+            const searchInput = document.getElementById('adminSearchInput');
+            const statusFilter = document.getElementById('adminStatusFilter');
+            const clearButton = document.getElementById('clearFilterButton');
+            const refreshButton = document.getElementById('refreshQueueButton');
+
+            statusFilter.value = adminQueueState.status;
+
+            searchInput.addEventListener('input', (event) => {
+                const value = String(event.target.value || '').trim();
+                window.clearTimeout(adminQueueSearchDebounce);
+                adminQueueSearchDebounce = window.setTimeout(() => {
+                    adminQueueState.search = value;
+                    adminQueueState.page = 1;
+                    loadDoctorQueue();
+                }, 300);
+            });
+
+            statusFilter.addEventListener('change', (event) => {
+                adminQueueState.status = String(event.target.value || 'pending');
+                adminQueueState.page = 1;
+                loadDoctorQueue();
+            });
+
+            clearButton.addEventListener('click', () => {
+                adminQueueState.search = '';
+                adminQueueState.status = 'pending';
+                adminQueueState.page = 1;
+                searchInput.value = '';
+                statusFilter.value = 'pending';
+                loadDoctorQueue();
+            });
+
+            refreshButton.addEventListener('click', () => {
+                loadDoctorQueue();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initDashboardNavToggle();
+            bindAdminFilters();
+            await loadSidebarIdentity('admin');
+            await loadDoctorQueue();
+        });
+    </script>
+</body>
+</html>

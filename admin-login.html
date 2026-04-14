@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - MediSeba</title>
+    <meta name="description" content="Admin login for doctor verification management in MediSeba.">
+    <link rel="stylesheet" href="css/style.css?v=20260415-2">
+    <link rel="stylesheet" href="css/responsive.css?v=20260404-2">
+    <link rel="stylesheet" href="css/auth.css?v=20260415-1">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+<body class="auth-page auth-page-admin">
+    <div class="auth-container">
+        <div class="auth-image">
+                <div class="auth-image-shell">
+                    <div class="auth-image-content">
+                        <span class="auth-side-kicker">Secure admin access</span>
+                        <h2>Admin Portal</h2>
+                        <p>Review doctor applications, approve verified profiles, and keep moderation decisions in one focused workspace.</p>
+                        <p class="auth-side-tagline">A clean OTP flow designed to keep admin review fast, consistent, and easy to manage.</p>
+
+                        <div class="auth-trust-signals" aria-label="Admin trust signals">
+                            <span><i class="fas fa-user-shield"></i> Authorized</span>
+                            <span><i class="fas fa-shield-check"></i> Audited</span>
+                            <span><i class="fas fa-bolt"></i> Fast</span>
+                        </div>
+
+                        <div class="auth-features auth-feature-grid">
+                        <div class="auth-feature">
+                            <span class="auth-feature-icon"><i class="fas fa-user-check"></i></span>
+                            <div class="auth-feature-copy">
+                                <strong>Approve doctors safely</strong>
+                                <span>Activate verified doctors without leaving the admin review flow.</span>
+                            </div>
+                        </div>
+                        <div class="auth-feature">
+                            <span class="auth-feature-icon"><i class="fas fa-list-check"></i></span>
+                            <div class="auth-feature-copy">
+                                <strong>Review the pending queue</strong>
+                                <span>See which doctor profiles still need a decision at a glance.</span>
+                            </div>
+                        </div>
+                        <div class="auth-feature">
+                            <span class="auth-feature-icon"><i class="fas fa-user-slash"></i></span>
+                            <div class="auth-feature-copy">
+                                <strong>Keep the directory trusted</strong>
+                                <span>Reject unsupported profiles while preserving an audit trail.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="auth-side-glance">
+                    <span class="auth-side-glance-label">Admin flow</span>
+                    <strong>Doctor approvals, rejections, and queue decisions stay organized from one OTP sign in.</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-form-container">
+            <div class="auth-form-wrapper">
+                <div class="auth-brand-row">
+                    <a href="index.html" class="auth-logo" aria-label="MediSeba home">
+    <img src="images/logo-mark.svg" alt="" class="logo-mark">
+    <span class="logo-wordmark" aria-hidden="true"><span class="logo-wordmark-primary">Medi</span><span class="logo-wordmark-secondary">Seba</span></span>
+</a>
+
+                    <div class="auth-role-banner admin">
+                        <i class="fas fa-user-shield"></i>
+                        <span>Admin Login</span>
+                    </div>
+                </div>
+
+                <div class="auth-role-note">
+                    <strong>This page is for admins only.</strong>
+                    <p>Continue here to review doctor applications and manage verification decisions. Only the authorized admin account can continue from this OTP flow.</p>
+                </div>
+
+                <div class="auth-step" id="step1">
+                    <h1>Continue as an admin</h1>
+                    <p class="auth-subtitle">Enter your admin email to receive a one-time code. This portal is reserved for the single authorized admin account.</p>
+
+                    <form id="emailForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="email" class="form-label form-label-required">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-icon"><i class="fas fa-envelope"></i></span>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    class="form-input"
+                                    placeholder="admin@example.com"
+                                    required
+                                    autocomplete="email">
+                            </div>
+                            <span class="form-hint">Use the email for the admin account</span>
+                            <span class="form-error hidden" id="emailError"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg" id="sendOtpBtn" data-loading-text="Sending OTP...">
+                            <span>Verify &amp; continue</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </form>
+
+                    <div class="auth-divider"><span>or</span></div>
+
+                    <div class="auth-alt auth-alt-card auth-switch-card">
+                        <p class="auth-alt-title">Need a different portal?</p>
+                        <p>Use the role-specific patient or doctor login for appointments, schedules, prescriptions, and payments.</p>
+                        <div class="auth-role-links">
+                            <a href="login.html" class="btn btn-outline">
+                                <i class="fas fa-user"></i>
+                                Patient Login
+                            </a>
+                            <a href="doctor-login.html" class="btn btn-outline">
+                                <i class="fas fa-user-md"></i>
+                                Doctor Login
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="auth-step hidden" id="step2">
+                    <button class="btn-back" id="backToEmail">
+                        <i class="fas fa-arrow-left"></i>
+                        Back
+                    </button>
+
+                    <h1>Verify Admin OTP</h1>
+                    <p class="auth-subtitle">Enter the 6-digit admin login code sent to <strong id="maskedEmail"></strong></p>
+
+                    <form id="otpForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="otp" class="form-label form-label-required">OTP Code</label>
+                            <div class="otp-inputs">
+                                <input type="text" maxlength="1" class="otp-digit" data-index="0">
+                                <input type="text" maxlength="1" class="otp-digit" data-index="1">
+                                <input type="text" maxlength="1" class="otp-digit" data-index="2">
+                                <input type="text" maxlength="1" class="otp-digit" data-index="3">
+                                <input type="text" maxlength="1" class="otp-digit" data-index="4">
+                                <input type="text" maxlength="1" class="otp-digit" data-index="5">
+                            </div>
+                            <input type="hidden" id="otp" name="otp">
+                            <span class="form-error hidden" id="otpError"></span>
+                        </div>
+
+                        <div class="otp-timer">
+                            <span>Code expires in </span>
+                            <span id="timer" class="timer">05:00</span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg" id="verifyOtpBtn" data-loading-text="Verifying...">
+                            <span>Verify Admin Access</span>
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </form>
+
+                    <div class="auth-resend">
+                        <p>Didn't receive the code?</p>
+                        <button class="btn-link" id="resendOtp" disabled>
+                            Resend OTP <span id="resendTimer">(60s)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="auth-footer">
+                    <p>Authorized admin use only. All doctor verification actions are audited for security.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/api.js?v=20260414-1"></script>
+    <script src="js/email-otp.js?v=20260404-1"></script>
+    <script src="js/auth.js?v=20260414-1"></script>
+    <script src="js/app.js?v=20260415-2"></script>
+    <script>
+        let currentEmail = '';
+        let otpExpiryTimer = null;
+        let resendTimer = null;
+        let activeLoadingButton = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (Auth.isLoggedIn()) {
+                window.location.href = Auth.getDashboardUrl();
+                return;
+            }
+
+            initEmailForm();
+            initOtpForm();
+            initOtpInputs();
+        });
+
+        function initEmailForm() {
+            const form = document.getElementById('emailForm');
+            const emailInput = document.getElementById('email');
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const email = String(emailInput.value || '').trim();
+
+                if (!validateEmail(email)) {
+                    showError('emailError', 'Please enter a valid email address.');
+                    return;
+                }
+
+                hideError('emailError');
+                showLoading(document.getElementById('sendOtpBtn'));
+
+                try {
+                    const requestResult = await API.auth.requestOTP(email, 'admin');
+                    await deliverOtpIfNeeded(email, requestResult, 'admin login');
+
+                    currentEmail = email;
+                    document.getElementById('maskedEmail').textContent = maskEmail(email);
+
+                    showStep(2);
+                    startOtpTimer(300);
+                    startResendTimer(60);
+                    showToast('Admin OTP sent successfully.', 'success');
+                    document.querySelector('.otp-digit[data-index="0"]')?.focus();
+                } catch (error) {
+                    showError('emailError', error.message || 'Failed to send OTP.');
+                } finally {
+                    hideLoading();
+                }
+            });
+        }
+
+        function initOtpForm() {
+            document.getElementById('backToEmail').addEventListener('click', () => {
+                showStep(1);
+                clearTimers();
+            });
+
+            document.getElementById('resendOtp').addEventListener('click', async () => {
+                const resendButton = document.getElementById('resendOtp');
+                if (resendButton.disabled) {
+                    return;
+                }
+
+                showLoading(document.getElementById('verifyOtpBtn'));
+
+                try {
+                    const requestResult = await API.auth.requestOTP(currentEmail, 'admin');
+                    await deliverOtpIfNeeded(currentEmail, requestResult, 'admin login');
+                    startOtpTimer(300);
+                    startResendTimer(60);
+                    document.querySelectorAll('.otp-digit').forEach((input) => {
+                        input.value = '';
+                    });
+                    document.getElementById('otp').value = '';
+                    showToast('A new OTP was sent.', 'success');
+                } catch (error) {
+                    showToast(error.message || 'Failed to resend OTP.', 'error');
+                } finally {
+                    hideLoading();
+                }
+            });
+
+            document.getElementById('otpForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const otp = String(document.getElementById('otp').value || '');
+
+                if (otp.length !== 6) {
+                    showError('otpError', 'Please enter the full 6-digit code.');
+                    return;
+                }
+
+                hideError('otpError');
+                showLoading(document.getElementById('verifyOtpBtn'));
+
+                try {
+                    const result = await API.auth.verifyOTP(currentEmail, otp, 'admin');
+
+                    Auth.setToken(result.token);
+                    Auth.setUser(result.user);
+
+                    showToast('Admin login successful.', 'success');
+                    window.setTimeout(() => {
+                        window.location.href = 'admin-dashboard.html';
+                    }, 700);
+                } catch (error) {
+                    showError('otpError', error.message || 'Invalid OTP.');
+                } finally {
+                    hideLoading();
+                }
+            });
+        }
+
+        function initOtpInputs() {
+            const inputs = document.querySelectorAll('.otp-digit');
+            const hiddenInput = document.getElementById('otp');
+
+            inputs.forEach((input, index) => {
+                input.addEventListener('input', (event) => {
+                    event.target.value = event.target.value.replace(/[^0-9]/g, '');
+                    hiddenInput.value = Array.from(inputs).map((item) => item.value).join('');
+
+                    if (event.target.value && index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                });
+
+                input.addEventListener('keydown', (event) => {
+                    if (event.key === 'Backspace' && !event.target.value && index > 0) {
+                        inputs[index - 1].focus();
+                    }
+                });
+
+                input.addEventListener('paste', (event) => {
+                    event.preventDefault();
+                    const pasted = event.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+                    pasted.split('').forEach((digit, pastedIndex) => {
+                        if (inputs[pastedIndex]) {
+                            inputs[pastedIndex].value = digit;
+                        }
+                    });
+
+                    hiddenInput.value = pasted;
+                    if (inputs[pasted.length]) {
+                        inputs[pasted.length].focus();
+                    }
+                });
+            });
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('.auth-step').forEach((item) => item.classList.add('hidden'));
+            document.getElementById(`step${step}`)?.classList.remove('hidden');
+        }
+
+        function validateEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function maskEmail(email) {
+            const [local = '', domain = ''] = email.split('@');
+            if (local.length <= 2) {
+                return email;
+            }
+            return `${local.slice(0, 2)}${'*'.repeat(local.length - 2)}@${domain}`;
+        }
+
+        function startOtpTimer(seconds) {
+            clearInterval(otpExpiryTimer);
+            const timer = document.getElementById('timer');
+            let remaining = seconds;
+            otpExpiryTimer = window.setInterval(() => {
+                remaining -= 1;
+                timer.textContent = formatTimer(remaining);
+
+                if (remaining <= 0) {
+                    clearInterval(otpExpiryTimer);
+                    showError('otpError', 'OTP expired. Please request another code.');
+                }
+            }, 1000);
+        }
+
+        function startResendTimer(seconds) {
+            clearInterval(resendTimer);
+            const resendButton = document.getElementById('resendOtp');
+            const resendLabel = document.getElementById('resendTimer');
+            let remaining = seconds;
+
+            resendButton.disabled = true;
+            resendLabel.textContent = `(${remaining}s)`;
+
+            resendTimer = window.setInterval(() => {
+                remaining -= 1;
+                resendLabel.textContent = `(${remaining}s)`;
+
+                if (remaining <= 0) {
+                    clearInterval(resendTimer);
+                    resendButton.disabled = false;
+                    resendLabel.textContent = '';
+                }
+            }, 1000);
+        }
+
+        function clearTimers() {
+            clearInterval(otpExpiryTimer);
+            clearInterval(resendTimer);
+        }
+
+        async function deliverOtpIfNeeded(email, requestResult, context) {
+            if (!requestResult?.otp) {
+                return;
+            }
+
+            await EmailOtp.sendOtp(email, requestResult.otp, context);
+        }
+
+        function formatTimer(seconds) {
+            const mins = Math.floor(Math.max(seconds, 0) / 60);
+            const secs = Math.max(seconds, 0) % 60;
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function setButtonLoading(button, isLoading) {
+            if (!button) {
+                return;
+            }
+
+            const label = button.querySelector('span');
+            const icon = button.querySelector('i');
+
+            if (isLoading) {
+                activeLoadingButton = button;
+                button.dataset.originalLabel = label ? label.textContent : '';
+                button.dataset.originalIcon = icon ? icon.className : '';
+                button.disabled = true;
+                button.classList.add('is-loading');
+                if (label && button.dataset.loadingText) {
+                    label.textContent = button.dataset.loadingText;
+                }
+                if (icon) {
+                    icon.className = 'fas fa-spinner fa-spin';
+                }
+                return;
+            }
+
+            button.disabled = false;
+            button.classList.remove('is-loading');
+
+            if (label && button.dataset.originalLabel) {
+                label.textContent = button.dataset.originalLabel;
+            }
+            if (icon && button.dataset.originalIcon) {
+                icon.className = button.dataset.originalIcon;
+            }
+        }
+
+        function showLoading(button) {
+            setButtonLoading(button, true);
+            document.getElementById('loadingOverlay')?.classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay')?.classList.remove('active');
+            if (activeLoadingButton) {
+                setButtonLoading(activeLoadingButton, false);
+                activeLoadingButton = null;
+            }
+        }
+
+        function showError(id, message) {
+            const element = document.getElementById(id);
+            if (!element) {
+                return;
+            }
+            element.textContent = message;
+            element.classList.remove('hidden');
+        }
+
+        function hideError(id) {
+            const element = document.getElementById(id);
+            if (!element) {
+                return;
+            }
+            element.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

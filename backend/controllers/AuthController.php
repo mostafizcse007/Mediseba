@@ -39,7 +39,7 @@ class AuthController
         // Validate input
         $validator = Validator::quick($request, [
             'email' => 'required|email',
-            'role' => 'in:patient,doctor'
+            'role' => 'in:patient,doctor,admin'
         ]);
         
         if (!$validator['valid']) {
@@ -60,6 +60,19 @@ class AuthController
         // Check if user exists, create if not
         $user = $this->userModel->findByEmail($email);
         $this->assertRoleMatchesExistingUser($user, $requestedRole);
+
+        if ($requestedRole === 'admin') {
+            $this->assertSingleAdminIntegrity();
+
+            if (!$user || $user['role'] !== 'admin') {
+                Response::forbidden('Admin account not found. Please contact the system owner.');
+            }
+        }
+
+        if ($user && $user['status'] !== 'active') {
+            Response::forbidden('Your account is not active. Please contact support.');
+        }
+
         $userId = $user ? $user['id'] : null;
         
         // Invalidate any existing OTPs for this email
@@ -104,7 +117,7 @@ class AuthController
         $validator = Validator::quick($request, [
             'email' => 'required|email',
             'otp' => 'required|length:6',
-            'role' => 'in:patient,doctor'
+            'role' => 'in:patient,doctor,admin'
         ]);
         
         if (!$validator['valid']) {
@@ -122,6 +135,14 @@ class AuthController
 
         $existingUser = $this->userModel->findByEmail($email);
         $this->assertRoleMatchesExistingUser($existingUser, $role);
+
+        if ($role === 'admin') {
+            $this->assertSingleAdminIntegrity();
+
+            if (!$existingUser || $existingUser['role'] !== 'admin') {
+                Response::forbidden('Admin account not found. Please contact the system owner.');
+            }
+        }
         
         // Get latest valid OTP request
         $otpRequest = $this->otpModel->getLatestValidRequest($email);
@@ -140,8 +161,14 @@ class AuthController
             ]);
         }
         
-        // Find or create user with requested role
-        $user = $this->userModel->findOrCreateByEmail($email, $role);
+        // Find or create user with requested role (admins must exist already)
+        $user = $role === 'admin'
+            ? $existingUser
+            : $this->userModel->findOrCreateByEmail($email, $role);
+
+        if (!$user || $user['status'] !== 'active') {
+            Response::forbidden('Your account is not active. Please contact support.');
+        }
         
         // Ensure email is marked verified
         if (!$user['email_verified_at']) {
@@ -376,7 +403,7 @@ class AuthController
     {
         $role = $request['role'] ?? 'patient';
 
-        return in_array($role, ['patient', 'doctor'], true) ? $role : 'patient';
+        return in_array($role, ['patient', 'doctor', 'admin'], true) ? $role : 'patient';
     }
 
     private function assertRoleMatchesExistingUser(?array $user, string $requestedRole): void
@@ -385,7 +412,11 @@ class AuthController
             return;
         }
 
-        $targetPage = $user['role'] === 'doctor' ? 'Doctor Login' : 'Patient Login';
+        $targetPage = match ($user['role']) {
+            'doctor' => 'Doctor Login',
+            'admin' => 'Admin Login',
+            default => 'Patient Login'
+        };
 
         Response::conflict(
             sprintf(
@@ -394,6 +425,13 @@ class AuthController
                 $targetPage
             )
         );
+    }
+
+    private function assertSingleAdminIntegrity(): void
+    {
+        if ($this->userModel->hasMultipleAdmins()) {
+            Response::serverError('Admin account configuration is invalid. Only one admin is allowed.');
+        }
     }
 
     private function sendOtpViaEmailJs(string $email, string $otp, string $role): array

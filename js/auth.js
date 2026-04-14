@@ -64,12 +64,32 @@ const Auth = {
 
     // Get dashboard URL for current user
     getDashboardUrl() {
-        return this.getRole() === 'doctor' ? 'doctor-dashboard.html' : 'dashboard.html';
+        const role = this.getRole();
+
+        if (role === 'doctor') {
+            return 'doctor-dashboard.html';
+        }
+
+        if (role === 'admin') {
+            return 'admin-dashboard.html';
+        }
+
+        return 'dashboard.html';
     },
 
     // Get profile URL for current user
     getProfileUrl() {
-        return this.getRole() === 'doctor' ? 'doctor-my-profile.html' : 'profile.html';
+        const role = this.getRole();
+
+        if (role === 'doctor') {
+            return 'doctor-my-profile.html';
+        }
+
+        if (role === 'admin') {
+            return 'admin-dashboard.html';
+        }
+
+        return 'profile.html';
     },
     
     // Logout user

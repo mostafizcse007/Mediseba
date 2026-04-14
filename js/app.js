@@ -42,6 +42,12 @@ function getPreferredTheme() {
     return getStoredTheme() || 'light';
 }
 
+function prefersReducedMotion() {
+    return typeof window !== 'undefined'
+        && typeof window.matchMedia === 'function'
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 function updateThemeToggleButton(theme = getPreferredTheme()) {
     const toggle = document.getElementById('themeToggle');
     if (!toggle) {
@@ -386,9 +392,15 @@ function initDashboardNavToggle() {
 }
 
 async function loadSidebarIdentity(role = 'patient', options = {}) {
-    const normalizedRole = role === 'doctor' ? 'doctor' : 'patient';
-    const fallbackName = normalizedRole === 'doctor' ? 'Doctor' : 'Patient';
-    const fallbackIcon = normalizedRole === 'doctor' ? 'fa-user-md' : 'fa-user';
+    const normalizedRole = role === 'doctor'
+        ? 'doctor'
+        : (role === 'admin' ? 'admin' : 'patient');
+    const fallbackName = normalizedRole === 'doctor'
+        ? 'Doctor'
+        : (normalizedRole === 'admin' ? 'Admin' : 'Patient');
+    const fallbackIcon = normalizedRole === 'doctor'
+        ? 'fa-user-md'
+        : (normalizedRole === 'admin' ? 'fa-user-shield' : 'fa-user');
     const retries = Math.max(0, Number(options.retries || 0));
     const retryDelay = Math.max(0, Number(options.retryDelay || 300));
     const user = Auth.getUser() || {};
@@ -492,6 +504,55 @@ function initMobileNav() {
             }
         });
     }
+}
+
+function initSmoothScrolling() {
+    if (typeof document === 'undefined' || document.body?.dataset.smoothScrollBound === 'true') {
+        return;
+    }
+
+    document.body.dataset.smoothScrollBound = 'true';
+
+    document.addEventListener('click', (event) => {
+        const link = event.target.closest('a[href]');
+        if (!link) {
+            return;
+        }
+
+        const href = String(link.getAttribute('href') || '').trim();
+        if (!href || href === '#' || link.hasAttribute('download') || link.target === '_blank') {
+            return;
+        }
+
+        let url;
+        try {
+            url = new URL(href, window.location.href);
+        } catch (error) {
+            return;
+        }
+
+        if (url.origin !== window.location.origin || url.pathname !== window.location.pathname || !url.hash) {
+            return;
+        }
+
+        const target = document.querySelector(url.hash);
+        if (!target) {
+            return;
+        }
+
+        event.preventDefault();
+
+        target.scrollIntoView({
+            behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+            block: 'start'
+        });
+
+        if (window.history && typeof window.history.pushState === 'function') {
+            window.history.pushState(null, '', url.hash);
+        } else {
+            window.location.hash = url.hash;
+        }
+    });
 }
 
 function makeIconsDecorative() {
@@ -1149,6 +1210,7 @@ async function loadUpcomingAppointments() {
 function initPage() {
     ensureFavicon();
     ensureThemeToggle();
+    initSmoothScrolling();
     initMobileNav();
     makeIconsDecorative();
     loadHeroStats();

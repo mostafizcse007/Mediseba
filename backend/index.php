@@ -124,6 +124,7 @@ use MediSeba\Controllers\DoctorController;
 use MediSeba\Controllers\AppointmentController;
 use MediSeba\Controllers\PrescriptionController;
 use MediSeba\Controllers\PaymentController;
+use MediSeba\Controllers\AdminController;
 use MediSeba\Controllers\UploadController;
 
 // Initialize secure session
@@ -222,6 +223,11 @@ $routes = [
     'POST api/payments/{id}/refund' => [PaymentController::class, 'refund', 'doctor'],
     'GET api/payments/{id}/receipt' => [PaymentController::class, 'downloadReceipt', 'auth'],
     'GET api/payments/{id}' => [PaymentController::class, 'show', 'auth'],
+
+    // Admin Routes
+    'GET api/admin/doctors' => [AdminController::class, 'doctorQueue', 'admin'],
+    'POST api/admin/doctors/{id}/approve' => [AdminController::class, 'approveDoctor', 'admin'],
+    'POST api/admin/doctors/{id}/reject' => [AdminController::class, 'rejectDoctor', 'admin'],
 ];
 
 // Match route

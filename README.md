@@ -1,9 +1,10 @@
 # MediSeba
 
-MediSeba is a role-based healthcare web application built with PHP, MySQL, HTML, CSS, and JavaScript. It supports two main user roles:
+MediSeba is a role-based healthcare web application built with PHP, MySQL, HTML, CSS, and JavaScript. It supports three user roles:
 
 - `Patient`
 - `Doctor`
+- `Admin`
 
 The platform is designed for appointment booking, digital prescriptions, payment tracking, profile management, and doctor-patient consultation chat.
 
@@ -28,6 +29,11 @@ The platform is designed for appointment booking, digital prescriptions, payment
 - Manage weekly schedule
 - View patient details inside workflow pages
 - Manage professional profile and profile photo
+
+### Admin Features
+- OTP-based login for the single system admin
+- Review pending doctor profiles
+- Approve or reject doctor verification requests
 
 ### Shared Features
 - Light mode and dark mode
@@ -133,7 +139,29 @@ Useful local URLs:
 - Home: `http://localhost/`
 - Patient Login: `http://localhost/login.html`
 - Doctor Login: `http://localhost/doctor-login.html`
+- Admin Login: `http://localhost/admin-login.html`
 - phpMyAdmin: `http://localhost/phpmyadmin/`
+
+### 7. Create the single admin account
+
+MediSeba allows only one admin user in the `users` table.
+
+If your imported database does not already contain an admin row, create it once in phpMyAdmin:
+
+```sql
+INSERT INTO users (email, password_hash, role, status, email_verified_at, created_at, updated_at)
+VALUES ('admin@mediseba.com', NULL, 'admin', 'active', NOW(), NOW(), NOW());
+```
+
+If you already have an existing database and want the database itself to block a second admin row, run:
+
+- [`database/single_admin_migration.sql`](database/single_admin_migration.sql)
+
+Then log in through:
+
+```text
+http://localhost/admin-login.html
+```
 
 ## OTP Delivery
 
@@ -209,6 +237,10 @@ Important:
 - [doctor-prescriptions.html](doctor-prescriptions.html)
 - [doctor-schedule.html](doctor-schedule.html)
 - [doctor-my-profile.html](doctor-my-profile.html)
+
+### Admin Pages
+- [admin-login.html](admin-login.html)
+- [admin-dashboard.html](admin-dashboard.html)
 
 ### Shared Workflow Page
 - [chat.html](chat.html)

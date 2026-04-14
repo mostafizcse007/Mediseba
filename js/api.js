@@ -455,6 +455,22 @@ const API = {
         refund(id, amount, reason) {
             return API.post(`api/payments/${id}/refund`, { amount, reason });
         }
+    },
+
+    // Admin endpoints
+    admin: {
+        doctorQueue(params = {}) {
+            const queryString = buildQueryString(params);
+            return API.get(queryString ? `api/admin/doctors?${queryString}` : 'api/admin/doctors');
+        },
+
+        approveDoctor(doctorProfileId, payload = {}) {
+            return API.post(`api/admin/doctors/${doctorProfileId}/approve`, payload);
+        },
+
+        rejectDoctor(doctorProfileId, payload = {}) {
+            return API.post(`api/admin/doctors/${doctorProfileId}/reject`, payload);
+        }
     }
 };
 

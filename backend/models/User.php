@@ -43,6 +43,28 @@ class User extends Model
     {
         return $this->findBy('email', $email);
     }
+
+    /**
+     * Create a new user while enforcing the single-admin rule.
+     */
+    public function create(array $data): int
+    {
+        $this->assertAdminRoleAvailable($data['role'] ?? null);
+
+        return parent::create($data);
+    }
+
+    /**
+     * Update a user while enforcing the single-admin rule.
+     */
+    public function update(int $id, array $data): bool
+    {
+        if (array_key_exists('role', $data)) {
+            $this->assertAdminRoleAvailable($data['role'], $id);
+        }
+
+        return parent::update($id, $data);
+    }
     
     /**
      * Find or create user by email
@@ -62,6 +84,33 @@ class User extends Model
         ]);
         
         return $this->find($id);
+    }
+
+    /**
+     * Count admin users, optionally excluding one user ID.
+     */
+    public function countAdmins(?int $excludeUserId = null): int
+    {
+        $sql = "SELECT COUNT(*) FROM {$this->table} WHERE role = ?";
+        $params = ['admin'];
+
+        if ($excludeUserId !== null) {
+            $sql .= " AND {$this->primaryKey} <> ?";
+            $params[] = $excludeUserId;
+        }
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * Check whether the database is misconfigured with multiple admins.
+     */
+    public function hasMultipleAdmins(): bool
+    {
+        return $this->countAdmins() > 1;
     }
     
     /**
@@ -193,5 +242,19 @@ class User extends Model
         
         $stmt = $this->db->query($sql);
         return $stmt->fetch();
+    }
+
+    /**
+     * Ensure the singleton admin role is not assigned twice.
+     */
+    private function assertAdminRoleAvailable(mixed $role, ?int $excludeUserId = null): void
+    {
+        if ($role !== 'admin') {
+            return;
+        }
+
+        if ($this->countAdmins($excludeUserId) > 0) {
+            throw new \RuntimeException('Only one admin account is allowed.');
+        }
     }
 }

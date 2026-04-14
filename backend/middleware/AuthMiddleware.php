@@ -117,7 +117,14 @@ class AuthMiddleware
      */
     public static function requireAdmin(): array
     {
-        return self::requireRole('admin');
+        $user = self::requireRole('admin');
+        $userModel = new User();
+
+        if ($userModel->hasMultipleAdmins()) {
+            Response::serverError('Admin account configuration is invalid. Only one admin is allowed.');
+        }
+
+        return $user;
     }
     
     /**

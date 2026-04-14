@@ -101,6 +101,7 @@
     --interactive-surface: rgba(13, 148, 136, 0.08);
     --interactive-surface-strong: rgba(13, 148, 136, 0.14);
     --interactive-border: rgba(13, 148, 136, 0.22);
+    --scroll-offset: 96px;
 }
 
 :root[data-theme='dark'] {
@@ -155,6 +156,7 @@
 
 html {
     scroll-behavior: smooth;
+    scroll-padding-top: var(--scroll-offset);
 }
 
 body {
@@ -163,6 +165,13 @@ body {
     line-height: 1.6;
     color: var(--text-primary);
     background-color: var(--surface-page);
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
 }
 
 body.nav-open {
